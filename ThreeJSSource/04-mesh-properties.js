@@ -99,11 +99,11 @@ const controls = new function () {
 
     this.translate = function () { // translate button 클릭 시 실행되는 함수
 
-        cube.translateX(controls.translateX);
-        cube.translateY(controls.translateY);
-        cube.translateZ(controls.translateZ);
+        cube.translateX(controls.translateX); // translateX 값만큼 x축 방향으로 cube를 이동 (상대적)
+        cube.translateY(controls.translateY); // translateY 값만큼 y축 방향으로 cube를 이동 (상대적)
+        cube.translateZ(controls.translateZ); // translateZ 값만큼 z축 방향으로 cube를 이동 (상대적)
 
-        controls.positionX = cube.position.x;
+        controls.positionX = cube.position.x; // 옮겨진 position 값을 다시 controls에 보여줌
         controls.positionY = cube.position.y;
         controls.positionZ = cube.position.z;
     }

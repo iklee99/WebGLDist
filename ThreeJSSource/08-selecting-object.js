@@ -1,21 +1,19 @@
 import * as THREE from 'three';
-import { Projector } from 'three/addons/renderers/Projector.js';
 import { initStats, initRenderer, initCamera, initOrbitControls, 
          initDefaultLighting, addGroundPlane } from './util.js';
 
 const scene = new THREE.Scene();
-const renderer = initRenderer();
-const camera = initCamera();
-const stats = initStats();
-const orbitControls = initOrbitControls(camera, renderer);
+const renderer = initRenderer();  // util.js
+const camera = initCamera(); // util.js
+const stats = initStats(); // util.js
+const orbitControls = initOrbitControls(camera, renderer); // util.js
 
-const projector = new Projector();
-
+// mouse down event handler 설정
 document.addEventListener('mousedown', onDocumentMouseDown, false);  
 
-initDefaultLighting(scene);
+initDefaultLighting(scene); // util.js
 
-const groundPlane = addGroundPlane(scene)
+const groundPlane = addGroundPlane(scene)  // util.js
 groundPlane.position.y = 0;
 
 // create a cube
@@ -63,10 +61,6 @@ camera.lookAt(scene.position);
 const ambienLight = new THREE.AmbientLight(0x353535);
 scene.add(ambienLight);
 
-// call the render function
-let step = 0;
-let scalingStep = 0;
-
 render();
 
 function render() {
@@ -82,15 +76,15 @@ function onDocumentMouseDown(event) {
                                     -(event.clientY / window.innerHeight) * 2 + 1, 0.5);
     vector = vector.unproject(camera); // 현재 click된 point를 3D 좌표로 변환 (world 좌표계)
 
-    // Raycaster: origin, direction, near, far
-    // origin: 카메라의 위치, vector.sub(camera.position): 카메라의 위치에서 클릭된 위치로 향하는 벡터
+    // Raycaster: origin, direction
+    // origin: 카메라의 위치, direction: 카메라의 위치에서 클릭된 위치로 향하는 벡터 (vector.sub(camera.position))
     const raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
     const intersects = raycaster.intersectObjects([sphere, cylinder, cube]);
 
     if (intersects.length > 0) { // 하나 이상의 intersection이 발생하면, 가장 가까운 object를 선택
         console.log(intersects[0]);
-        intersects[0].object.material.transparent = true;
-        intersects[0].object.material.opacity = 0.1;
+        intersects[0].object.material.transparent = true; // select된 object를 투명 가능하게 하는 option
+        intersects[0].object.material.opacity = 0.1;      // 투명도는 0.1로 설정
         // material update flag를 true로 해 주어야만 three.js가 렌더링 시 
         // 재계산을 하게 된다. material을 투명하게 만들었음. 
         intersects[0].object.material.needsUpdate = true;

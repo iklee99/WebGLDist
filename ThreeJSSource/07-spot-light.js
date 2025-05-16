@@ -1,5 +1,6 @@
 // 07-spot-light.js
 // - SpotLightHelper
+// - SpotLight's CameraHelper
 // - Spotlight penumbra
 // - spotlight target
 

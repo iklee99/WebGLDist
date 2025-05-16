@@ -104,7 +104,7 @@ const controls = new function () {
 gui.add(controls, 'switchCamera');
 gui.add(controls, 'perspective').listen();
 
-const clock = new THREE.Clock();
+//const clock = new THREE.Clock();
 
 render();
 
