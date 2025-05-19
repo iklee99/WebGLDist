@@ -1,3 +1,13 @@
+// 12-load-fbx-anim.js
+// Load FBX model and animation using three.js
+// https://threejs.org/docs/#examples/en/loaders/FBXLoader
+// Character와 animation은 "Mixamo"에서 다운로드 된 것임
+// https://www.mixamo.com/#/
+// Keyboard UI:
+//   1: Idle
+//   2: JoyfulJump
+//   3: RumbaDancing
+
 import * as THREE from 'three';  
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { initStats, initCamera, initRenderer, initOrbitControls, 
@@ -10,15 +20,20 @@ const KEY_1 = 49, KEY_2 = 50, KEY_3 = 51, KEY_4 = 52;  // number keys' keycodes
 // scene, renderer,camera, orbit controls, stats
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xaaaaaa);
-const renderer = initRenderer();
+
+const renderer = initRenderer();1
+
 const camera = initCamera(); 
 camera.position.set(-1, 50, 250);
 scene.add(camera);
+
 const clock = new THREE.Clock();
+
 const orbitControls = initOrbitControls(camera, renderer);
 orbitControls.target.set(1, 70, 0); 
 orbitControls.enableKeys = false;   // disable orbit control's keyboard control 
 orbitControls.update();
+
 const stats = initStats();
 
 // lighting 
@@ -83,13 +98,11 @@ async function loadAnimations() {
         // 두 번째 파일 로드 (애니메이션)
         const secondObject = await loadFBX('JoyfulJump.fbx');
         const secondAction = mixer.clipAction(secondObject.animations[0]);
-        secondAction.clampWhenFinished = true;
         actions.push(secondAction);
 
         // 세 번째 파일 로드 (애니메이션)
         const thirdObject = await loadFBX('RumbaDancing.fbx');
         const thirdAction = mixer.clipAction(thirdObject.animations[0]);
-        thirdAction.clampWhenFinished = true;
         actions.push(thirdAction);
 
         // 모든 로드가 완료된 후 애니메이션 시작
@@ -111,10 +124,8 @@ animate();
 function keyCodeOn(event) {
     if (KEY_1 <= event.keyCode && event.keyCode <= KEY_3) {
         const action = actions[event.keyCode - KEY_1]; 
-        //mixer.stopAllAction();
         actions[actionIndex].stop(); 
-        //action.reset();
-        action.fadeIn(0.2);
+        action.fadeIn(0.2);  // 새 action이 crossfade 되는 시간을 0.2초로 설정
         action.play();
         actionIndex = event.keyCode - KEY_1; 
     }	

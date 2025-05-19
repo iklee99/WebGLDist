@@ -45,12 +45,14 @@ scene.add(plane);
 // 11. THREE.TextureKeyframeTrack: 텍스처 키프레임 트랙
 // 12. THREE.PropertyBinding: 속성 바인딩
 //
-// KeyframeTrack: name, times (keyframe이 있는 time들의 array), 
-// values (keyframe이 있는 time에 대응하는 value들의 array), 
-// interpolation (보간 방식):
-// 1. THREE.InterpolateLinear: 선형 보간 (default)
-// 2. THREE.InterpolateSmooth: 부드러운 보간 (Cubic Hermite Spline)
-// 3. THREE.InterpolateDiscrete: 불연속 보간 (keyframe에서 값이 갑자기 변함)
+// KeyframeTrack: 
+//   - name 
+//   - times (keyframe이 있는 time들의 array), 
+//   - values (keyframe이 있는 time에 대응하는 value들의 array), 
+//   - interpolation (보간 방식):
+//      1. THREE.InterpolateLinear: 선형 보간 (default)
+//      2. THREE.InterpolateSmooth: 부드러운 보간 (Cubic Hermite Spline)
+//      3. THREE.InterpolateDiscrete: 불연속 보간 (keyframe에서 값이 갑자기 변함)
 
 // Animation 만드는 순서
 // 1) Keyframe data 준비 (time array, value array)
@@ -59,14 +61,15 @@ scene.add(plane);
 // 4) Mixer와 Action 생성
 // 5) Animation Loop 실행
 
-// Rotation animation
+// 1) Rotation animation (data 준비)
 const rotationTimes = [0, 1, 2];
 const rotationValues = [
-    0,          // 0초: 0도
-    Math.PI,    // 1초: 180도
-    Math.PI * 2 // 2초: 360도
+    0,                // 0초: 0도
+    Math.PI * 0.5,    // 1초: 90도
+    Math.PI * 1.5     // 2초: 270도
 ];
 
+// 2) Rotation track 생성
 const rotationTrack = new THREE.KeyframeTrack(
     box.name + '.rotation[y]', // 회전 축을 y축으로 설정
     rotationTimes,
@@ -74,7 +77,7 @@ const rotationTrack = new THREE.KeyframeTrack(
     THREE.InterpolateSmooth
 );
 
-// Position animation
+// 1) Position animation (data 준비)
 const positionTimes = [0, 1, 2];
 const positionValues = [
     0, 0, 0,           // 시작 위치
@@ -82,20 +85,25 @@ const positionValues = [
     0, 0, 0            // 끝 위치
 ];
 
+// 2) Position track 생성
 const positionTrack = new THREE.KeyframeTrack(
     box.name + '.position',
     positionTimes,
     positionValues
 );
 
-// Animation clips: name, duration, tracks (KeyframeTrack들의 array)
+// 3) Animation clips: name, duration, tracks (KeyframeTrack들의 array)
 const rotationClip = new THREE.AnimationClip('Rotation', 2, [rotationTrack]);
 const positionClip = new THREE.AnimationClip('Position', 2, [positionTrack]);
 
-// Mixer and actions
-const mixer = new THREE.AnimationMixer(box);
-const rotationAction = mixer.clipAction(rotationClip);
-const positionAction = mixer.clipAction(positionClip);
+// 여러 channel을 가진 clip 생성 하려면
+// const clip = new THREE.AnimationClip('clipName', duration, [track1, track2, ...]);
+// 이와 같이 하면 됩니다. 
+
+// 4) Mixer and actions
+const mixer = new THREE.AnimationMixer(box); // box에 대한 animation mixer 생성
+const rotationAction = mixer.clipAction(rotationClip);  // rotation clip에 대한 action 생성
+const positionAction = mixer.clipAction(positionClip);  // position clip에 대한 action 생성
 
 // AnimationAction: 애니메이션 재생 제어: manual 참고 할 것
 // AnimationAction.play(): 애니메이션 재생
@@ -105,8 +113,12 @@ const positionAction = mixer.clipAction(positionClip);
 //   - THREE.LoopRepeat: 반복 재생
 //   - THREE.LoopOnce: 한 번만 재생
 //   - THREE.LoopPingPong: 왕복 재생
+//
+// Clip과 Action의 차이점:
+// Clip: 애니메이션의 데이터 (키프레임, 트랙 등)
+// Action: 애니메이션의 상태 (재생, 정지 등) 제어를 위해 사용
 
-const clock = new THREE.Clock();
+const clock = new THREE.Clock(); // animation용 clock 생성
 let isPositionPlaying = true; // Track current animation
 let switchTimer = 0; // Time tracker for switching animations
 
@@ -116,7 +128,7 @@ animate();
 function animate() {
     requestAnimationFrame(animate);
 
-    const delta = clock.getDelta();
+    const delta = clock.getDelta(); // 지난 frame부터 경과한 시간
     switchTimer += delta;
 
     // Switch animations every 2 seconds
@@ -132,8 +144,8 @@ function animate() {
         isPositionPlaying = !isPositionPlaying;
     }
 
-    mixer.update(delta);
-    stats.update();
+    mixer.update(delta); // Animation mixer update 반드시 해야 함
+    stats.update(); 
     orbitControls.update();
     renderer.render(scene, camera);
 }
