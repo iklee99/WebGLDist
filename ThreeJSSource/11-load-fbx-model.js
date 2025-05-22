@@ -10,10 +10,31 @@ scene.background = new THREE.Color( 0xa0a0a0 );
 const renderer = initRenderer();
 
 const camera = initCamera();
-camera.position.set( 200, 200, 500 );
+camera.position.set( 300, 300, 600 );
 scene.add(camera);
 
-initDefaultDirectionalLighting(scene);
+const dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+dirLight.position.set( -500, 500, 500 );
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.width = 2048;
+dirLight.shadow.mapSize.height = 2048;
+dirLight.shadow.camera.near = 0.5;
+dirLight.shadow.camera.far = 2000;
+dirLight.shadow.camera.left = -500;
+dirLight.shadow.camera.right = 500;
+dirLight.shadow.camera.top = 500;
+dirLight.shadow.camera.bottom = -500;
+scene.add( dirLight );
+
+// Directional Light Helper
+const dirLightHelper = new THREE.DirectionalLightHelper( dirLight, 5 );
+dirLightHelper.visible = true; 
+scene.add( dirLightHelper );
+
+// Directional Light Shadow Camera Helper
+const dirLightShadowCameraHelper = new THREE.CameraHelper( dirLight.shadow.camera );
+dirLightShadowCameraHelper.visible = true; 
+scene.add( dirLightShadowCameraHelper );
 
 // ground
 const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000 ), 
@@ -47,7 +68,8 @@ let carRoot;
 loader.load( './assets/models/cartoonCar/Cartoon_Car_Simple.fbx', function ( object ) {
     object.traverse( function ( child ) {
         //console.log(child.name); 
-        if (child.name == 'Car') {
+        //fbx 파일을 Blender에서 import하여 outliner에서 root object의 이름을 확인 가능
+        if (child.name == 'Car') { 
             carRoot = child; 
         }
         if ( child.isMesh ) {
@@ -72,6 +94,7 @@ function onWindowResize() {
 function animate() {
     requestAnimationFrame( animate );
     let currentTime = Date.now(); 
+    // startTime 부터 경과된 시간
     let time = (currentTime - startTime) / 1000;  // in seconds
     const zSize = 200; 
     // -zSize ~ zSize 사이를 자동차가 왔다 갔다 함

@@ -15,7 +15,10 @@ import { initStats, initCamera, initRenderer, initOrbitControls,
 
 // global variables
 let mixer; 
-const KEY_1 = 49, KEY_2 = 50, KEY_3 = 51, KEY_4 = 52;  // number keys' keycodes
+// number keys' keycodes
+// Reference: JavaScript KeyboardEvent.keyCode
+// https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode
+const KEY_1 = 49, KEY_2 = 50, KEY_3 = 51, KEY_4 = 52;  
 
 // scene, renderer,camera, orbit controls, stats
 const scene = new THREE.Scene();
@@ -39,9 +42,19 @@ const stats = initStats();
 // lighting 
 initDefaultDirectionalLighting(scene);
 const dirLight = new THREE.DirectionalLight(0xffffff, 2.0);
-dirLight.position.set(-10, 50, 20);
+dirLight.position.set(-10, 20, 20);
 dirLight.castShadow = true;
 scene.add(dirLight);
+
+// ambient light
+const ambientLight = new THREE.AmbientLight(0x444444, 1.0);
+ambientLight.position.set(0, 0, 0);
+scene.add(ambientLight);
+
+// point light
+const dirLight2 = new THREE.DirectionalLight(0xffffff, 1);
+dirLight2.position.set(0, -10, -10);
+scene.add(dirLight2);
 
 // ground
 const ground = new THREE.Mesh( new THREE.PlaneGeometry( 400, 400 ), 
@@ -60,11 +73,14 @@ const actions = [];
 
 const loader = new FBXLoader();
 const assetPath = './assets/models/Jakie/';
-loader.setPath(assetPath);
+loader.setPath(assetPath); // FBX file이 위치한 folder
 
 let actionIndex = 0;
 
-// FBX 파일을 로드하는 Promise를 반환하는 함수
+// FBX 파일을 로드하는 Promise를 return하는 함수
+// 시간이 걸리는 비동기 (asynchronous) 작업을 처리하기 위해 Promise를 사용
+// FBXLoader는 비동기적으로 파일을 로드하므로, Promise를 사용하여 로드 완료 후 작업을 수행
+// Promise는 성공(resolve), 또는 실패(reject) 중 하나의 상태를 가짐
 function loadFBX(filename) {
     return new Promise((resolve, reject) => {
         loader.load(filename, 
@@ -75,12 +91,15 @@ function loadFBX(filename) {
     });
 }
 
-// 순차적으로 파일들을 로드
+// Idle, JoyfulJump, RumbaDancing 애니메이션을 포함한 FBX 파일을 load
+// Mixamo에서 download할 때, "With Skin" 옵션을 선택하면 Mesh + Animation을 포함
+// "Without Skin" 옵션을 선택하면 Animation만 포함하는 FBX를 다운로드
 async function loadAnimations() {
     try {
-        // 첫 번째 파일 로드 (모델 + 애니메이션)
+        // 첫 번째 파일 로드 (Model + Animation)
         const firstObject = await loadFBX('Idle+Skin.fbx');
         mixer = new THREE.AnimationMixer(firstObject);
+        // 한 개의 animation만 포함된 경우, animations[0]에 들어 있음
         const firstAction = mixer.clipAction(firstObject.animations[0]);
         firstAction.play();
         actions.push(firstAction);
@@ -89,8 +108,8 @@ async function loadAnimations() {
         // 모델 설정
         firstObject.traverse(child => {
             if (child.isMesh) {
-                child.material.transparent = false;
-                child.castShadow = true;
+                child.material.transparent = false;  // 모든 mesh의 material을 불투명하게 
+                child.castShadow = true; // 모든 mesh part가 그림자를 만들도록 설정
             }
         });
         scene.add(firstObject);
@@ -127,7 +146,7 @@ function keyCodeOn(event) {
         actions[actionIndex].stop(); 
         action.fadeIn(0.2);  // 새 action이 crossfade 되는 시간을 0.2초로 설정
         action.play();
-        actionIndex = event.keyCode - KEY_1; 
+        actionIndex = event.keyCode - KEY_1; // 새로운 action의 index를 저장
     }	
 }
 
@@ -141,7 +160,7 @@ function animate() {
     requestAnimationFrame( animate );
     renderer.render( scene, camera );
     const dt = clock.getDelta();
-    if (mixer) mixer.update(dt);
+    if (mixer) mixer.update(dt); 
     stats.update();
     orbitControls.update();
 }
