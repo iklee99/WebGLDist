@@ -661,7 +661,7 @@ export function computeNormalsGroup(group) {
     }
 }
 
-export function addGeometry(scene, geom, name, texture, gui, controls) {
+export function addGeometry(scene, geom, texture) {
     var mat = new THREE.MeshStandardMaterial(
       {
         map: texture,
@@ -672,8 +672,6 @@ export function addGeometry(scene, geom, name, texture, gui, controls) {
     mesh.castShadow = true;
     
     scene.add(mesh);
-    //addBasicMaterialSettings(gui, controls, mat, name + '-THREE.Material');
-    //addSpecificMaterialSettings(gui, controls, mat, name + '-THREE.MeshStandardMaterial');
   
     return mesh;
   };

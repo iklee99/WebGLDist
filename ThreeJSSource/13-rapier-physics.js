@@ -1,8 +1,13 @@
 import * as THREE from 'three';  
-// Rapier physics engine 
 import RAPIER from 'https://cdn.skypack.dev/@dimforge/rapier3d-compat';
+// for 2D RAPIER engine: 
+// import RAPIER from 'https://cdn.skypack.dev/@dimforge/rapier2d-compat';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-//import * as RAPIER from 'three/addons/physics/RapierPhysics.js';
+
+// Rapier physics engine: 이 예제 이외의 기능은 rpaier3d site를 볼 것 (https://rapier.rs/)
+// Mesh에 해당하는 RigidBody를 생성하고, 
+// 
+
 // --- 전역 변수 ---
 let scene, camera, renderer, clock;
 let physicsWorld;
@@ -15,8 +20,8 @@ const params = {
     createObjects: function() {
         // 기존 객체들 제거
         objects.forEach(obj => {
-            scene.remove(obj.mesh);
-            physicsWorld.removeRigidBody(obj.body);
+            scene.remove(obj.mesh); // scene에서 mesh object 제거
+            physicsWorld.removeRigidBody(obj.body); // physicsWorld에서 body 제거 
         });
         objects.length = 0;
         
@@ -123,6 +128,7 @@ function createGround() {
     // setFriction(2.0): 마찰 계수 설정, Ground 위의 물체의 미끌어짐 정도에 영향을 줌
     // parameter: 위의 PlaneGeometry 크기의 half로 x, z 값 지정
     //            y 값은 0.1로 지정
+    // cuboid collider의 크기는 half length로 지정하므로 50으로 함
     const groundColliderDesc = RAPIER.ColliderDesc.cuboid(50, 0.1, 50)
         .setFriction(2.0);
 
@@ -170,8 +176,8 @@ function createObject() {
         colliderDesc = RAPIER.ColliderDesc.cuboid(size, size, size);
     }
     
-    // Restitution: 반발계수, 물체가 충돌할 때 반발하는 정도, 크면 튕기는 정도가 세짐
-    // Friction: 마찰계수, 물체가 충돌할 때 마찰력이 작용하는 정도, 크면 미끌어지는 정도가 약해짐 
+    // Restitution: 반발계수, 물체가 충돌할 때 반발하는 정도, 크면 튕기는 정도가 강해짐
+    // Friction: 마찰계수, 물체가 충돌할 때 마찰력이 작용하는 정도, 크면 미끌어지는 정도가 줄어듦
     colliderDesc.setRestitution(0.8).setFriction(1.0);
     physicsWorld.createCollider(colliderDesc, body);
 
@@ -197,7 +203,7 @@ function animate() {
     // Rapier.js 물리 시뮬레이션을 한 스텝 진행합니다.
     physicsWorld.step();
 
-    // 생성된 모든 구에 대해 물리 엔진에서 계산된 위치와 회전을 three.js Mesh에 반영합니다.
+    // 생성된 모든 sphere (또는 cube) 에 대해 물리 엔진에서 계산된 위치와 회전을 three.js Mesh에 반영합니다.
     objects.forEach((obj) => {
         const pos = obj.body.translation();
         const rot = obj.body.rotation();
@@ -212,3 +218,9 @@ function animate() {
 init().catch(error => {
     console.error("Failed to initialize:", error);
 });
+
+// Rigid body와 Collider 이외에 RAPIER에서 제공하는 기능
+// 1. Joint: 물체를 연결하는 기능
+// 2. Character Controller: 
+//      예) "Stop at obstacles", "Slide down slopes", "Climb stairs", "Walk over small obstacles"
+// 3. Scene Queries:Ray Casting, Intersection Test, 등 

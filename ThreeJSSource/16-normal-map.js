@@ -36,6 +36,9 @@ const cubeMaterial = new THREE.MeshStandardMaterial({
     roughness: 0.07
 });
 
+// normal map: 3D model surface에 높낮이 detail을 추가하여 더 현실적인 효과
+// normal map image는 RGB로 표현되며, R은 X축, G는 Y축, B는 Z축의 높낮이를 나타냄
+// normal map은 bump map과 달리 높낮이 detail을 더 정확하게 표현할 수 있음
 const cubeMaterialWithNormalMap = cubeMaterial.clone();
 cubeMaterialWithNormalMap.normalMap = textureLoader.load("./assets/textures/plaster-normal.jpg")
 

@@ -9,8 +9,6 @@ const camera = initCamera(new THREE.Vector3(0, 20, 40));
 const orbitControls = initOrbitControls(camera, renderer);
 const clock = new THREE.Clock();
 
-// create a scene, that will hold all our elements such as objects, cameras and lights.
-// and add some simple default lights
 const scene = new THREE.Scene();
 const textureLoader = new THREE.TextureLoader();
 const groundPlane = addLargeGroundPlane(scene, true)
@@ -23,6 +21,7 @@ const gui = new GUI();
 const controls = {};
 
 const cube = new THREE.BoxGeometry(16, 16, 16)
+// 일반적인 texture를 적용한 material
 const cubeMaterial = new THREE.MeshStandardMaterial({
     map: textureLoader.load("./assets/textures/stone.jpg"),
     metalness: 0.2,
