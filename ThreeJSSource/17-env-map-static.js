@@ -42,7 +42,7 @@ var cubeMaterial = new THREE.MeshStandardMaterial({
     metalness: 1,        // 금속성 최대
     roughness: 0,        // 거칠기 최소
     transparent: true,   // 투명도 활성화
-    opacity: 1,          // 불투명도 = 1 (완전 불투명))
+    opacity: 1,          // 불투명도 = 1 (초기: 완전 불투명)
     refractionRatio: 0   // 굴절률 = 0
 });
 
@@ -50,7 +50,7 @@ var cubeMaterial = new THREE.MeshStandardMaterial({
 var sphereMaterial = cubeMaterial.clone();
 // sphere의 normal map을 설정하여 표면에 세부적인 높낮이 효과를 추가
 sphereMaterial.normalMap = textureLoader.load("./assets/textures/engraved/Engraved_Metal_003_NORM.jpg");
-sphereMaterial.refractionRatio = 0.6; // 구체는 다른 굴절률
+sphereMaterial.refractionRatio = 0.6; // sphere는 다른 굴절률을 가짐
 
 const cube = new THREE.BoxGeometry(16, 12, 12)
 const cube1 = addGeometryWithMaterial(scene, cube, 'cube', gui, controls, cubeMaterial);
@@ -61,7 +61,7 @@ const sphere = new THREE.SphereGeometry(10, 50, 50)
 const sphere1 = addGeometryWithMaterial(scene, sphere, 'sphere', gui, controls, sphereMaterial);
 sphere1.position.x = 15;
 
-// 수정된 부분: controls 객체를 직접 사용
+// GUI initialization
 gui.add(controls, "refraction").onChange(function(value) {
   // refraction: 빛이 물체를 통과할 때 굴절되는 효과를 나타냄
   // reflection: 물체의 표면에 반사되는 효과를 나타냄
@@ -114,6 +114,7 @@ gui.add(controls, "refraction").onChange(function(value) {
 });
 
 render(); 
+
 function render() {
   stats.update();
   orbitControls.update();

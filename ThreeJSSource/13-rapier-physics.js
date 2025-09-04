@@ -1,50 +1,41 @@
+// Simple example of using RAPIER physics engine with Three.js
+// https://rapier.rs/
+// Rapier physics engine: 이 예제 이외의 기능은 rpaier3d site를 볼 것 (https://rapier.rs/)
+// Mesh에 해당하는 RigidBody와 Collider를 생성하여 물리 엔진과 연결
+
 import * as THREE from 'three';  
 import RAPIER from 'https://cdn.skypack.dev/@dimforge/rapier3d-compat';
-// for 2D RAPIER engine: 
-// import RAPIER from 'https://cdn.skypack.dev/@dimforge/rapier2d-compat';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-// Rapier physics engine: 이 예제 이외의 기능은 rpaier3d site를 볼 것 (https://rapier.rs/)
-// Mesh에 해당하는 RigidBody를 생성하고, 
-// 
-
-// --- 전역 변수 ---
-let scene, camera, renderer, clock;
-let physicsWorld;
-const objects = [];  // spheres 배열을 objects로 변경
+// Global variables
+let scene, camera, renderer;
+let physicsWorld;    // scene에 대응하는 Rapier의 physics world
+const objects = [];  // spheres (또는 cubes) array
 
 // GUI 컨트롤을 위한 파라미터
 const params = {
-    shape: 'sphere',    // 'sphere' 또는 'cube'
-    count: 100,        // 1에서 500 사이
-    createObjects: function() {
-        // 기존 객체들 제거
+    shape: 'sphere',   // 'sphere' 또는 'cube'
+    count: 100,        // 1에서 500개 사이
+    createObjects: function() { // button press function
+        // 기존 object들 모두 제거
         objects.forEach(obj => {
             scene.remove(obj.mesh); // scene에서 mesh object 제거
             physicsWorld.removeRigidBody(obj.body); // physicsWorld에서 body 제거 
         });
         objects.length = 0;
         
-        // 새로운 객체들 생성
+        // 새로운 object들 생성
         scheduleObjects();
     }
 };
 
-// GUI 설정
-function initGUI() {
-    const gui = new GUI();
-    gui.add(params, 'shape', ['sphere', 'cube']).name('Shape');
-    gui.add(params, 'count', 1, 500, 1).name('Count');
-    gui.add(params, 'createObjects').name('Simulation Start');
-}
-
-// --- 초기화 순서 변경 ---
+// Initialization function 
 async function init() {
     initThree();
     await initPhysics();  // RAPIER 초기화 완료를 기다린 후
-    createGround();      // 기다린 후 여기로 진행 가능
-    initGUI();          // GUI 초기화 추가
-    scheduleObjects();  // 초기 객체 생성
+    createGround();       // 기다린 후 여기로 진행 가능
+    initGUI();            // GUI 초기화 추가
+    scheduleObjects();    // 초기 객체 생성
     animate();
 }
 
@@ -82,7 +73,6 @@ function initThree() {
     directionalLight.shadow.camera.bottom = -50;
     scene.add(directionalLight);
 
-    clock = new THREE.Clock();
     window.addEventListener("resize", onWindowResize, false);
 }
 
@@ -93,7 +83,7 @@ function onWindowResize() {
 }
 
 // ============================
-// 2. Rapier.js 물리 월드 초기화
+// 2. Rapier: 물리 월드 초기화
 // ============================
 async function initPhysics() { 
     await RAPIER.init(); 
@@ -118,25 +108,43 @@ function createGround() {
 
     // Ground Mesh에 대응하는 RAPIER Description + Body 생성
     // fixed(): ground는 움직이지 않음
-    const groundBodyDesc = RAPIER.RigidBodyDesc.fixed() 
-        .setTranslation(0, 0, 0);
+    const groundBodyDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(0, 0, 0);
     const groundBody = physicsWorld.createRigidBody(groundBodyDesc);
 
     // Ground Mesh에 대응하는 RAPIER Collider Description 생성
     // Collider: 충돌 계산에 사용되는 simple한 형태의 geometry
     // cuboid(): box 형태의 collider
-    // setFriction(2.0): 마찰 계수 설정, Ground 위의 물체의 미끌어짐 정도에 영향을 줌
-    // parameter: 위의 PlaneGeometry 크기의 half로 x, z 값 지정
-    //            y 값은 0.1로 지정
+    // parameter: 위의 PlaneGeometry 크기의 half로 x, z 값 지정, y 값은 0.1로 지정
     // cuboid collider의 크기는 half length로 지정하므로 50으로 함
-    const groundColliderDesc = RAPIER.ColliderDesc.cuboid(50, 0.1, 50)
-        .setFriction(2.0);
+    // setFriction(2.0): 마찰 계수 설정, Ground 위의 물체의 미끌어짐 정도에 영향을 줌
+    const groundColliderDesc = RAPIER.ColliderDesc.cuboid(50, 0.1, 50).setFriction(2.0);
 
     // Ground Mesh에 대응하는 RAPIER Collider 생성
     physicsWorld.createCollider(groundColliderDesc, groundBody);
 }
 
-// createObject 함수로 통합 (sphere와 cube 모두 처리)
+// ============================
+// 4. GUI 설정
+// ============================
+function initGUI() {
+    const gui = new GUI();
+    gui.add(params, 'shape', ['sphere', 'cube']).name('Shape');
+    gui.add(params, 'count', 1, 500, 1).name('Count');
+    gui.add(params, 'createObjects').name('Simulation Start');
+}
+
+// ============================
+// 5. scheduleObjects
+// ============================
+function scheduleObjects() {
+    for (let i = 0; i < params.count; i++) { // GUI의 object 갯수만큼 생성
+        setTimeout(() => {
+            createObject();
+        }, i * 100); // 100ms 간격으로 object 하나씩 생성
+    }
+}
+
+// createObject (sphere와 cube 모두 처리)
 function createObject() {
     const size = 0.5 + Math.random();  // random size: 0.5 ~ 1.5
     let mesh, colliderDesc;
@@ -165,8 +173,7 @@ function createObject() {
     // Rapier.js 물리 객체 생성
     // dynamic(): 고정된 물체가 아님
     // setTranslation(posX, posY, posZ): 위의 실제 geometry의 위치와 같게 설정
-    const bodyDesc = RAPIER.RigidBodyDesc.dynamic()
-        .setTranslation(posX, posY, posZ);
+    const bodyDesc = RAPIER.RigidBodyDesc.dynamic().setTranslation(posX, posY, posZ);
     const body = physicsWorld.createRigidBody(bodyDesc);
 
     // Colliders: sphere는 ball collider, cube는 cuboid collider
@@ -184,26 +191,16 @@ function createObject() {
     objects.push({ mesh, body }); // objects array에 이 pair를 추가 
 }
 
-// scheduleObjects 함수 수정
-function scheduleObjects() {
-    for (let i = 0; i < params.count; i++) { // GUI의 object 갯수만큼 생성
-        setTimeout(() => {
-            createObject();
-        }, i * 100); // 100ms 간격으로 object 하나씩 생성
-    }
-}
-
 // ============================
 // 6. 애니메이션 루프 및 물리 업데이트
 // ============================
 function animate() {
     requestAnimationFrame(animate);
-    const deltaTime = clock.getDelta();
 
-    // Rapier.js 물리 시뮬레이션을 한 스텝 진행합니다.
+    // Rapier.js 물리 시뮬레이션을 한 스텝 진행
     physicsWorld.step();
 
-    // 생성된 모든 sphere (또는 cube) 에 대해 물리 엔진에서 계산된 위치와 회전을 three.js Mesh에 반영합니다.
+    // 생성된 모든 sphere (또는 cube) 에 대해 물리 엔진에서 계산된 위치와 회전을 three.js Mesh에 반영
     objects.forEach((obj) => {
         const pos = obj.body.translation();
         const rot = obj.body.rotation();

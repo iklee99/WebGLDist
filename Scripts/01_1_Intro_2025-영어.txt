@@ -1,0 +1,99 @@
+﻿Let's start with the introduction
+Computer Graphics is the study of creating,
+manipulating, and using visual objects on computers,
+often abbreviated as CG
+It's easy to think of computer graphics as drawing pictures using software
+like Blender, 3D Max, or Photoshop
+However, in computer science, computer graphics
+refers to the technology of developing software to create graphical objects
+The subfields of computer graphics are broadly classified into three categories
+“Modeling” is the field of how to represent geometric objects within a computer,
+and is related to mathematical expressions or data structures
+“Rendering” is the field of how to draw modeled objects on the screen,
+and there are various methods such as Photorealistic Rendering that draws them exactly like the real world,
+and Non-Photorealistic Rendering that imitates other artistic work methods
+Animation is possible by continuously showing the result of rendering one frame, or scene, at a time while changing time
+The field that studies techniques for calculating the trajectory or shape changes of an object over time is called “animation.”
+A field related to CG is “image/video processing,” which processes images or videos
+In particular, the field of processing photos or videos taken by a camera for special purposes is called “Computational Photography.”
+“Human-Computer Interaction” is often abbreviated as “HCI”
+This is a field that studies the devices and interaction methods related to human use of computing devices
+“Visualization” is often categorized into two fields:
+“Scientific Visualization” and “Information Visualization,” which are the application fields
+in which early CG technology was widely used
+“Virtual Reality (VR)” and “Augmented Reality (AR)”
+And “Extended Reality (XR)”, which includes all of these,
+is one of the most notable fields of application of CG recently
+“3D printing” refers to the process of producing computer-modeled objects with real-world materials,
+and is also one of the fields that has been developing the fastest recently
+The most famous application of CG is film production
+Nowadays, it is common to produce movies by compositing live action footage with CG footage,
+which allows scenes that do not exist in reality
+to be created at a relatively low cost
+However, to produce graphics results so sophisticated that they are difficult to distinguish from reality,
+a single frame can require computing time that can take minutes, hours, or even days
+Another application area is gaming
+Especially in games, it is essential to render scenes in real time
+In real-time graphics, a rendering speed of at least 30 frames per second
+is generally required, so it is necessary to balance the quality of the rendering result with the speed of the rendering calculation
+Nowadays, game engines such as Unity and Unreal have been developed,
+making game production much easier, and one of the most important technologies
+used in these game engines is CG
+CG technology is being used
+in a variety of fields beyond entertainment,
+including design of machinery and architecture,
+visualization, education and training
+such as flight simulators, and media art
+In order for us to draw something on the computer screen,
+we first need to receive input from input devices
+We can input using devices such as keyboards, tablets, and mice
+The input is first stored in CPU memory, where it is processed in various ways
+This data is moved to GPU memory inside the GPU (Graphics Processing Unit)
+In particular, the memory that stores the pixel values currently being drawn on the screen is called the frame buffer
+The contents of the frame buffer are continuously drawn on the screen at a very fast rate
+So by continuously changing the contents of the frame buffer, we can see moving pictures (animation)
+Raster means a collection of pixels
+Pixel is short for picture element
+A pixel has one color and represents a location that occupies one coordinate on the screen
+The frame buffer that stores the raster currently being displayed is actually a collection of several buffers
+The frame buffer is composed of several buffers, such as a color buffer that stores the color values of pixels and a depth buffer that stores depth values
+Scan conversion, also called rasterization, is the process of converting polygons such as triangles into pixel data
+To draw a triangle on the screen as in the picture, we need to decide which pixels to turn on and which pixels to turn off
+Scan conversion is one of the tasks dedicated to GPU for CG
+GPU has graphical memory such as frame buffer, and special algorithms required for CG
+are implemented in hardware to run quickly
+GPUs were originally developed for CG, but are now widely used in computationally intensive applications such as machine learning and cryptocurrency mining
+Before the advent of the flat-panel display, which will be explained later, the most widely used output device was the CRT (Cathode-Ray-Tube)
+The raster display method, which uniformly displays the contents of the frame buffer, was also mainly used on CRTs
+The path of electrons fired from the electron gun of the CRT
+is bent by XY deflectors to reach the desired coordinates on the screen
+The surface of a CRT screen is coated with a phosphor that emits light when electrons strike it
+The speed at which a CRT screen is redrawn is called the refresh rate
+In the United States, a method of redrawing 60 times per second is commonly used, and this speed is called 60 hertz
+In Europe, 50 Hz is commonly used
+When refreshing, redrawing only odd rows once and only even rows the next time is called interacing
+When using interacing, a 60Hz refresh rate is actually a 30Hz refresh rate
+The most commonly used display these days is the flat-panel display
+It contains light-emitting elements between two 2D grids,
+one vertical and one horizontal, and uses the two grids to specify whether light will be visible at a specific location
+Depending on the technology used to create the light-emitting elements, flat panel displays are classified into LCD, LED, OLED, etc
+There are many different input devices used for computer graphics
+The mouse is something we use a lot in our daily lives, and it is also used a lot in graphics
+A trackball is a ball that rotates freely in 360 degrees for data entry, and is often used to input rotational amounts, etc. by rolling it with the palm of the hand
+Tablets are often used for drawing elaborate drawings using a stylus
+These days, expensive tablets that allow you to draw directly on the screen with a stylus are also commonly used. Joysticks are often used for things like gaming
+The Spaceball is similar to a trackball in its purpose, but instead of rolling a ball, you hold the ball in your hand and touch it to input input
+The home page for OpenGL is opengl.org
+OpenGL provides many functions for handling graphics and images
+OpenGL is not an API, that is, an Application Programming Interface, but rather a specification of an API
+So, OpenGL has a standard that describes what functions and variables exist
+That is, OpenGL can be implemented in various programming languages, such as C++, Java, Python, and JavaScript
+Typically, computers have two buffers for display: the front and back buffers
+The display screen always shows the contents of the front buffer
+Meanwhile, the application draws something to the back buffer, not the front
+As shown in the figure, while one frame of the animation is displayed on the screen, the program draws the next frame to the back buffer
+After that, the front and back buffers are swapped
+In other words, it swaps the pointers pointing to the front and back buffers
+This will prevent any flickering that may occur while drawing a new frame
+Flickering occurs when using only one buffer
+This video shows the flickering that occurs when using single buffering

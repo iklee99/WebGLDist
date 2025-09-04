@@ -1,0 +1,603 @@
+﻿
+Here, we will learn the most
+basic concepts of WebGL2 rendering by drawing a single 2D triangle
+This figure briefly summarizes the overall flow of drawing graphics
+in WebGL, especially WebGL2
+Let's look at each step in order:
+Here I will explain the process
+in order of what happens in the WebGL program
+First, write the Vertex Shader
+Source code and Fragment Shader Source code in GLSL language
+Typically, shader codes are written in string form
+and prepared to be transferred to the GPU using WebGL APIs
+such as glCreateShader and glShaderSource
+Next, using functions provided by WebGL such as glCompileShader,
+glAttachShader, and glLinkProgram, the previously prepared shaders are compiled
+and linked to create a single program,
+which is called a shader program
+Only after going through this process
+can the Vertex Shader and Fragment Shader work together to be drawn on the screen
+Thirdly, once the Shader program is built normally,
+the WebGL program passes the data to the Shader through the API,
+which is the actual data to be used in the Uniform data
+or attribute variables used in the Shader program
+For example, Vertex coordinate information This Vertex
+coordinate information is stored in VBO (Vertex
+Buffer Object) and connected to an Attribute variable,
+or there is a transformation matrix, Model View Projection matrix
+This is the process of passing something like this as a uniform variable
+4. After all settings are complete, call a function
+such as glDrawArrays or glDrawElements
+to actually draw the shape
+From this moment on, the GPU will execute the shader program
+and automatically handle the Vertex Shader, Rasterization, Fragment
+Shader and final pixel output processes
+On this page, you will find various function names and new terms
+There are many of these, so please wait a moment
+as I will explain them in detail later
+There are several other shaders in the OpenGL standard,
+including Vertex and Fragment Shaders,
+but these two must exist for rendering
+In this course we will only cover Vertex and Fragment Shaders
+A Vertex Shader is a program that runs for each vertex of a triangle,
+and shaders are written in the syntax of GLSL, i.e., OpenGL Shading Language
+The top line says Version 300 es,
+which means that the GLSL syntax
+used in this program follows OpenGL 3.0 version
+Shaders use several different types of variables
+First, the Attribute variable is only used in the Vertex shader,
+and is used to receive Attribute data corresponding to each Vertex
+from the WebGL program
+This data includes, for example, the Position coordinates of the Vertex, right? There's aPosition,
+the Normal Vector of the Vertex, and a variable called Anormal
+Or there may be Texture Coordinates of Vertex, Vertex Color, etc
+Don't worry if you don't understand the meaning of these data now,
+because you will learn them one by one later
+Here, there is something like Layout location = 0,
+which means that the location of the aPosition
+variable in this vertex shader is 0
+There is a keyword IN in front of the attribute variable name
+There is a vec3 that indicates the type of data, which means it is a 3-dimensional vector
+Here, both aPosition and aNormal variables are
+of 3D vector type
+The uniform variable value is also passed directly from the WebGL program to the shader
+Here, it is a 4 x 4 matrix, uSomeMatrix, which means some matrix
+Here, mat4 means 4 x 4 matrix
+It was passed for some transformation, that is, a conversion operation
+Unlike attribute variables, uniform variables can be considered as global variables
+that are commonly used for all vertices
+In other words, the attribute variables in front are passed values separately for each vertex
+Each vertex may have different position coordinates
+or normal vectors, right?
+But the uniform variable is all these vertices,
+if you draw a triangle, there are 3 vertices, right?
+You can think of it
+as a global variable that applies equally to all three vertices
+Then there is something called a varying variable
+This varying variable is used as a data conduit
+between the Vertex Shader and the Fragment Shader
+Data flows from the Vertex Shader
+to the Fragment Shader in this way,
+so the Vertex Shader adds the keyword out in front of the variable,
+and the Fragment Shader receives this as in
+If you look at the main program of the Vertex Shader,
+there is a predefined Variable called gl_Position
+Here is gl_Position
+The final Vertex Position data calculated in the Vertex Shader
+is assigned to this Variable
+These GLPosition coordinates are passed to the Fragment Shader
+and used to calculate position data corresponding to pixels
+In fact, this arrow should go like this
+In the fragment shader, the transformation matrix called uSomeMatrix,
+which is entered as a uniform variable in the main program,
+is used here to calculate gl_Position and then to calculate the value of the out
+variable of the vNormal variable that will be passed to the fragment shader
+Actually, this is not the correct Vertex Shader code
+However, in order to show you that there are these types of variables,
+I wrote them all down like this
+There are Attribute variables, Uniform variables,
+Bearing variables,
+etc., and the final output of the Vertex Shader
+is assigned to the Predefined Variable gl_Position
+Please keep this in mind
+Let's look at an example of a Fragment Shader
+While the Vertex Shader is executed once for each Vertex of a triangle,
+the Fragment Shader is a program that is executed for each Fragment,
+that is, each pixel
+Here, the sentences Precision, Medium, P, Float set the default precision of the float
+variable to be used in this shader
+Low is 16 bits, medium is 32 bits, and high is 64 bits,
+so high can be seen as double precision
+But the default is medium
+So the size of the float we use is 32 bits
+So, in fact, even if you don't use precision, medium, or pfloat, the default is medium
+You can think of it this way
+Next, in vec3 vNormal is also a varying variable,
+and it comes from the vertex shader
+So, vNormal comes from the vertex shader to the fragment shader,
+and this name must be the same as the out variable of the vertex shader
+The lowercase and uppercase letters must be the same
+It receives a varying variable from the vertex shader. Then, the out vec4
+FragColor will contain the final color
+that should be painted on the pixel
+where this fragment shader is currently being executed
+So this Prague color is actually the final output of the fragment shader
+You can see it like this
+So, for each pixel, it will be in the form of sending the color
+it calculates to the hardware
+uniform vec4 baseColor will be a global uniform
+variable passed directly from the WebGL program
+And there is a main program, and within the main program,
+FragColor is the final output
+This shows the process by which FragColor is calculated
+So, by performing the dot product of the vector
+representing vNormal and the Z-axis,
+if this value is positive,
+FragColor is assigned as a vector that takes twice each component of baseColor
+If the dot product is not positive, that is, negative or equal to 0,
+the base color is assigned to the fragment as is
+Actually, this is a code that has no meaning at all
+But these various types of variables can come in
+That is, varying is passed from the Vertex Shader,
+FragColor will be output in the end,
+uniform is passed from the WebGL program,
+and all of these are used to calculate FragColor in the end
+To demonstrate this, I am showing you an example program now
+But here a question arises
+Earlier, we said that the Vertex Shader is executed once per Vertex
+and the Fragment Shader is executed
+once per Fragment (i.e. per pixel)
+Assuming one triangle as shown in the figure, the Vertex Shader is executed at most three times
+For example, let's say that the value of the out
+variable to be passed to the fragment shader is vNormal vec3,
+but now let's say that the values 3,
+7, and 9 are passed as varying
+Even if it passes like this, there could be a lot of pixels like this to draw this triangle,
+and there are a lot of them
+Here, there are triangles like this, and they all need to be filled in,
+but only 3, 9, and 7 were conveyed
+In this case, the question arises as to how the values of varying variables
+corresponding to intermediate pixels that do not have vertices are determined
+So, as you can see in the picture on the far right,
+the value corresponding to each pixel
+can be obtained by interpolating the data of the pixels that contain the vertex
+So, we can see that the values corresponding to vertices 3,
+7, and 9 are linearly interpolated
+and used in the pixels forming the triangle
+Here, it is 3 and 7,
+and between these, the values are interpolated as 3, 4, 5, 6, 7
+Next, here, it shows that interpolation is being done in this way:
+3, 4, 5, 6, 7, 8, 9
+These interpolated values are automatically entered
+So, please remember that although the number of times
+the Vertex Shader and Fragment Shader are executed is different,
+they can run systematically because they use the interpolation method in this way
+Next, the Vertex Fragment Shader Vertex and Fragment
+Shader codes can be saved as separate files and read,
+but as shown in this slide, they are completely String values
+As a String value, we assigned a variable called VertexShaderSource like this
+It can be directly assigned to a JavaScript variable and used
+But here, it's okay because the VertexShader or FragmentShader is short,
+but if you have to keep writing this in the middle of the WebGL code,
+it's not convenient, and it's inconvenient to indent,
+and there are many problems
+So, in a little while, we will look at how to create these as independent files
+and read them to use them as shader sources
+This is the process of compiling and linking the Vertex Shader and Fragment
+Shader to create a shader program,
+and in fact, it calls quite a few API functions
+But actually, you don't need to know this in detail,
+so just take a look here and you should know that
+shaders are completed as shader programs
+through this process
+First, create a shader object
+First, create VertexShaderObject and FragmentShaderObject
+with gl.createShader and type,
+which will be gl.vertexShader or gl.fragmentShader
+So, we create two shader objects and then
+we put the variables that we assigned the source code to as Strings here,
+and we call the function
+called shaderSource to attach the shader to them and set them up
+So, first we create a shader object,
+then we paste the source code, and then we compile each one. We compile it with gl.compileShader
+So, we compile the vertexShader and fragmentShader,
+and then create something called shaderProgram
+This is because we're going to combine these two into one shader program, so we're only creating one
+So we're using a function called glCreateProgram
+Here, we attach VertexShader and FragmentShader by using gl.attachShader respectively
+And then you have to link again
+These two exchanged something like a varying variable earlier
+So, by using gl.linkProgram,
+we can combine the two into one complete program
+So now we are ready to use this shader program
+Now, from now on, I'm going to talk about something called Vertex Buffer Object
+Vertex Buffer Object is abbreviated as VBO
+This VBO refers to the memory within the GPU where Vertex Data, i.e
+Attribute Variable Data passed to the shader, is stored
+So, you need to know that VBO is a memory within the GPU and is a buffer where Vertex Data is stored,
+that is, where the Vertex Attribute values are stored
+Here, the vertex attribute is the coordinates of the vertex, called position
+Next, we can list color, texture coordinate, normal vector, etc
+We know what vertex coordinates and color are,
+and we will gradually learn about the rest
+So, the vertex data is transferred to the VBO
+in batches all at once
+One thing that's unusual here is that there's no specific,
+pre-defined format for storing data in a VBO
+So, what kind of VBO should be structured in what way?
+For example, there is no fixed grammar, such as position
+followed by a space and then color
+So, we have to decide how the data is arranged
+and saved within this buffer
+That's how much freedom was given
+But now there are things that we need to know a little more about
+So here we're going to see something called the OpenGL
+or WebGL Default Coordinate System
+What is the Default Coordinate System?
+When we try to draw something on the screen,
+the question is, what range of data can we draw with WebGL?
+As you can see in this picture, the X, Y, and Z coordinates are all between minus 1 and 1
+Y is also between minus 1 and 1, and Z is also between minus 1 and 1, right?
+This means that we can only draw the data inside that cube
+So, let's say XYZ are all closed intervals
+It must be within this range from minus 1 to 1 to be drawn
+This is called Normalized Device Coordinate, or NDC
+Later we will learn about camera placement and various transformations, but for now,
+let's assume that we will use only the default camera given
+and that OpenGL can only draw vertices
+whose coordinates are within this NDC space
+So for the time being,
+we'll be creating several example programs
+using only those whose XY coordinates are between minus 1 and 1
+This would be quite inconvenient, wouldn't it? Of course,
+since the number of real numbers is infinite,
+there are actually an infinite number of logarithms between minus 1 and 1,
+so it's not really inconvenient
+Still, rather than limiting this interval,
+it would be better to be able to freely draw things
+with such large coordinates. We'll look at that later
+So, there was something called gl_Position earlier
+What this is is the Return Value of the Vertex Shader
+This means that the Return Value of the Vertex Shader
+must be within the NDC range
+So, it's good to remember that
+Next is the homogenous coordinate,
+which represents an N-dimensional position as an N+1-dimensional vector
+In other words, the 3D position is expressed as a 4D vector with four components
+So, as we all know, 3D coordinates are X, Y, Z
+If we express this as homogenous coordinates, we add one more: X', Y', Z', W
+So how do we convert a homogenous 4D vector [X' Y' Z'
+W] into 3D coordinates?
+You can divide each by W
+So, the definition of homogeneous coordinates
+is that if you divide X' by W, Y' by
+W, and Z' by W, it becomes [X, Y, Z]
+So, this time, change [X, Y, Z] to homogeneous coordinates
+Then, you can add 1 to [X, Y, Z]
+Because if you divide each of these by 1, it becomes the same as X, Y, and Z
+So the formula that can go back and forth in both directions has been completed
+That is, if you add 1 to the 3D coordinate,
+it becomes a homogeneous coordinate, and if any homogeneous
+coordinate [X' Y' Z' W] is given,
+If you divide each of those by X, Y, and Z, you get a 3D vector
+So, as an example, if we change 3D P = [1,
+2, 3] to homogeneous coordinate P', as I said
+before, we can just add 1 to W at the end
+Then, convert the 4D homogeneous coordinate P' 2,
+4, 6, 1 into 3D vectors
+Then, divide each of them by this W into X, Y, and Z
+So it would be 1, 2, 3
+Huh? But 1, 2, 3 is the same as 1, 2, 3 here
+So, here, P' = [1, 2, 3, 1] and [2, 4, 6, 2] are the same
+If you change it to 3D, they are the same
+So then the question is why do we use homogenous coordinates?
+There are many aspects we can talk about
+However, if we look at the most intuitive reason,
+it is to express all possible Transformation operations, such as Translation,
+as 4 x 4 Matrix operations
+This might not be very clear right now
+because we haven't talked about Transformation at all,
+but we'll learn more about it later in the Transformation section
+So, we saw something called VBO earlier,
+but there is also something called Vertex Buffer Object
+VAO, which is an abbreviation for Vertex Array Object
+If VBO is a buffer for storing and transmitting actual vertex data,
+VAO can be seen as a container that stores the configuration status of how to connect and use multiple VBOs
+This means that multiple VBOs can be included
+In the picture,
+VAO1 contains VertexBuffer1 and VertexBuffer2
+Looking at VertexBuffer1 again,
+it has the attributes Position, Texture
+Coordinate, and Normal, while VertexBuffer2 only has color
+Okay, so this is a bit unusual
+The vertex buffer is now split, and these are different VBOs
+Even though the VBOs are different, they represent the same data
+Position, texture coordinates, and then normal are stored in VBO1, and the remaining colors,
+despite being their colors, are stored in a different VBO
+This is how configurations are possible
+So a VAO can contain multiple VBOs
+So, later on, we will draw each VBO, VBO, VBO separately,
+but if we do that, we will have to make too many calls,
+which is annoying, and we will not know where is which
+For example, if we draw something like a house,
+there will be a separate roof, a separate wall,
+a separate door, and so on, and there may be several separate parts
+Then there can be multiple VBOs
+You could also combine them into one VAO representing one house
+In this way, if we draw VAOs all at once,
+we can draw the VBOs belonging to them all at once,
+so we can do it conveniently
+Or, in this case, we can see that the VAO simply has one VBO
+Let's look at the commands that specify the VAO
+and VBO and move the data to the GPU
+First, let's define the Vertex Attribute data in an Array
+In this example, the object being drawn is only one triangle,
+and the triangle has only one attribute, Position,
+corresponding to three vertices, that is, Coordinate
+That is, these are 3D coordinates. One, two, three
+So, the 3D coordinates of the three vertices are assigned to the array in order
+Actually, that's true, but this is a 1D Array. I've arranged it in a 1D Array
+Since it is a 2D triangle, the Z coordinate of each vertex is set to 0,
+and the triangle is drawn on the XY plane
+Now the first thing to do is to set up, create, and bind a VAO
+Creating a VAO first is the first step, since VBOs belong to a VAO,
+so we'll create a VAO that will contain them
+(the VBOs) and leave the door open
+So, if you create a VAO with this gl.createVertexArray,
+it will now have this ID, the VAO ID
+Then, if you do gl.bindVertexArray(vao), it means that from now on, everything below
+this will be bound as belonging to VAO
+After creating and binding the VAO, a VBO is created
+It is created with the gl.createBuffer function
+and the VBO ID is returned and stored in the const vertexBuffer
+After creating a VBO, you bind it
+to mean that you want to move data to this VBO
+That is, this is an array in main memory right now
+What comes next is moving what's in this array to the VBO
+we created on the GPU we created
+The destination for moving
+is specified by gl.bindBuffer VBO
+If you look at the data inside the Vertices Array,
+you can see that it displays the actual coordinate data
+representing the X, Y, and Z values in the Position Coordinate
+The VBO that stores these actual data values is called gl.ARRAY_BUFFER
+Here, there is a tag called gl.ARRAY_BUFFER
+Then, instead of the actual coordinates,
+you can put something called index data
+So, the index data is 0, then 1, then 2, and so on
+We will look at this again
+in the notes later
+Now that the VBO is bound, we have this VerticesArray we created earlier with the bound VBO
+It's time to move the data of this VerticesArray
+This gl.bufferData does that. Simply put,
+the array called vertices is data on the CPU, and the currently bound
+VBO is a buffer on the GPU
+In other words, you can think of it as copying data from the CPU to the GPU as a buffer
+When data is copied, the data
+in the VBO corresponds to the value of the attributeVariable in the shader program
+There was something called an attribute variable in the shader, right?
+So now we're responding to that
+At this time, we need to tell the Vertex Shader in what format
+the VBO data is stored
+The function called gl.vertexAttribPointer plays that role
+That is, it informs the shader of the VBO's configuration
+The parameter being 0 indicates that the position,
+which is the VertexAttribData we are copying, is "data corresponding to location 0."
+In this example, since there is only one attribute, position,
+there are no other attributes beyond that,
+such as normal, texture coordinates, or color
+This second parameter, 3, is—there's 3 here,
+right? This 3 represents the number of data points corresponding to one vertex
+That is, I gave it 3 because I moved 3 data to XYZ with the position attribute
+gl.FLOAT refers to the type of attribute value to be copied,
+and we are using the 32-bit gl.FLOAT type
+The "false" after this indicates whether the copied data is normalized
+to a range between 0 and 1
+However, we rarely do anything by normalizing it
+So, let's set it to false for now
+Next, here zero represents the total size of the data
+corresponding to one vertex in bytes
+In other words, it indicates how many bytes are consumed for one vertex
+I set it to 0 here. If you set it to 0, it will be calculated automatically
+We'll look at that in the example below, but since it's calculated automatically,
+it's better to just set it to zero
+Next, the one at the very end here is called offset,
+and the zero before it is now called stride
+The one at the very end is called offset,
+and it means where to start in this VBO buffer
+Since the offset is zero, it starts from the beginning, without any blank spaces. That's what it means
+So, the shader now reads the VBO data
+and tells it how to find the vertex
+attribute when performing some calculation
+So here we had zero zero,
+which if you look at the vertex shader earlier, location = 0 in vec3 aPosition
+It was like this. You can think of this location value
+as being the same as 0, 0, etc
+So now we have completed the process of moving all VBO data
+After doing this, I unbind VAO and opened the VAO first
+So, you can unbind VAO by setting the bind
+vertex array to null
+Now, gl.vertexAttribPointer is quite problematic here
+Let's take an example
+to see the meaning of each parameter of this again
+If you look here now, the first 6 bytes of the buffer are empty
+Then, vertex 1 has one, two, three XYZ values,
+and vertex 2 has one, two, three XYZ XYZ values, and so on
+But each XYZ value is a float type of 32-bit float,
+so 32 bits, 4 x 8 = 32,
+that is, 4 bytes each, right? Since XYZ is each, one
+vertex consumes 12 bytes, right?
+The second vertex is also 12 bytes like this
+So, this size, which is the 12 bytes
+consumed by one vertex, is called stride
+So we calculate the stride,
+which is 3, because we have X, Y, Z, and then Float32Array.BYTES_PER_ELEMENT,
+which is now a JavaScript constant
+So this is 3 times this is 4 bytes,
+so float is 4 x 3 = 12, right? 3 x 4 = 12
+Then gl.vertexAttribPointer is 0 3 in front, and gl.FLOAT
+Then I wrote false, and here the stride is 12 bytes per write,
+and what's this 6?
+This means that the offset is 6, which is empty,
+so it starts 6 bytes later, right? So in the case below, this is 6
+So, let's take a look
+at the meaning of the parameters of gl.vertexAttribPointer again
+So after the Vertex Attribute data of the CPU is transferred to the VBO,
+the objects are rendered on the screen
+using the Vertex Shader and Fragment Shader
+This is now a WebGL program
+First, we compiled and linked the shader program
+we created in the very first part and finished creating and linking this shader program
+So, we first declare that we will use it by calling
+the function called gl.useProgram
+Then, inside the render function,
+as we saw in our first program,
+we first clear gl.COLOR_BUFFER_BIT
+Then, in order to draw the VAO,
+we need to bind the VAO again
+So, if you do gl.bindVertexArray(vao)
+and then call gl.drawArrays(gl.TRIANGLES, 0, 3),
+you will draw one triangle
+Here, 0 means that we start using data from the index
+0 of the first VBO, that is, from the very beginning, and count is 3,
+which means that the total number of vertices is 3
+Yes, so the data that starts first is vertex 0,
+and then 3 means that the total number of vertices is 3
+This gl.drawArrays is used when drawing VBO directly,
+and it is a little different when drawing indices later
+So remember that we use something called gl.drawArrays,
+and when we call rendering, an orange triangle will be drawn
+Now, let's look at OpenGL or WebGL primitives
+There are many types of these primitives
+We only pass the vertex coordinates, but how we use these vertex coordinates
+to draw something is defined by the primitive
+If you look at the front, we used gl.TRIANGLES, right?
+This gl.TRIANGLES means to draw a triangle
+using these three vertices
+as the three vertices of a triangle
+So, can you only draw triangles? If you give it gl.POINTS instead of gl.TRIANGLES,
+it will draw points one by one
+This doesn't create a surface or draw an edge,
+it just puts points one by one
+If you draw it on a Vertex and then use gl.LINES,
+Starting from the front, we continue to draw lines in pairs
+like (0, 1), (2, 3), (4, 5)
+gl.LINE_STRIP will now continue to draw lines in this order:
+0, 1, 2, 3, 4, 5. This is called gl.LINE_STRIP
+Next, gl.LINE_LOOP is, you know, it goes back to 0,
+1, 2, 3, 4, 5, and then 5
+draws a line back to the very beginning, 0
+This is called gl.LINE_LOOP
+Then gl.TRIANGLES is what we used, so 0, 1, 2, and then
+if there are other vertices that come after that
+They make 3, 4, 5 into one triangle,
+and then they put 3 together to make another triangle, and they draw it like this
+The primitive is called gl_TRIANGLES
+Next, gl_TRIANGLE_STRIP is a little bit special
+It becomes 0, 1, 2
+Then, if 3 comes in, it should be able to draw another triangle
+including itself using the two in front of it
+So here it's 0, 1, 2 and then it's a triangle called 1, 3, 2
+Then, if one more vertex 4 comes in, it becomes 2, 3, 4
+Then, when number 5 comes in, it becomes 4, 3, 5, etc
+Now, one thing to keep in mind here is that in WebGL, by default,
+when looking from the outside,
+the vertices of this triangle should rotate counterclockwise
+From now on, we'll only be drawing triangles
+I'm going to divide all the faces into triangles and draw them
+These triangles should be rotated counterclockwise
+when viewed from the outside
+Of course, WebGL's default rendering flag is
+You are supposed to paint both the outside and the inside
+But if we want to be more efficient later,
+we might not paint the inside
+In that case, you need to distinguish which side is inside and which side is outside
+If you look at it from the outside and turn it counterclockwise,
+this side is the outside
+So when we draw, we always have to think
+in counterclockwise order like this
+In that sense, we have to look at the order of gl.TRIANGLE_STRIP
+It would be 0, 1, 2, and then the next one would be 1, 3, 2, or 2, 1, 3
+Because it's counterclockwise
+The next one should be 2, 3, 4, then 4,
+3, 5 or 3, 5, 4, and so on
+Next, there is another one, gl.TRIANGLE_FAN
+gl.TRIANGLE_FAN is a little different from gl.TRIANGLE_STRIP
+It draws edges like this to all the following vertices, starting from V0
+So in a fan shape (0, 1, 2) then (0, 2, 3), (0, 3, 4), (0, 4, 5)
+Creating triangles in this way would be gl.TRIANGLE_FAN
+So if you want to draw something
+First, send all the vertices of the polygon you want to draw using
+vao and vbo, and then tell it
+which primitive to draw with and call gl.drawArrays to draw it
+That's the summary
+So let's look at our second program, Hello Triangle
+Let's start with HelloTriangle.js
+First, get the canvas we used last time
+After that, I did all the work of getting the GL-context
+Next, here, the width and height of the canvas
+were previously taken from windows.innerwidth
+and innerheight
+and used as the current width and height of the window,
+but here, I artificially created a starting size with 500 and 500
+If you do this,
+this size will be maintained until you resize it
+Then, when you do Add Event Listener Resize,
+it just becomes the window width and height,
+so I'll try to run it later, but now it will suddenly pop up
+Recreate the viewport. Here,
+I use the current canvas size of the viewport
+and set the Clear Color
+Next, there is the Vertex Shader Source and the fragment shader source
+So let's take a look at the vertex shader source
+This version has layout(location = 0) in vec3 aPos
+So, there is an attribute variable that only inputs position,
+and since gl_Position must now be returned homogeneously,
+we add one more w to aPos and return it
+as is with 1 added to w as gl_Position
+Because we only pass coordinates that are all within the NDC,
+we assumed that and just assigned it to gl_Position like this
+What about Fragment Shader Source then?
+What happens when you set Precision and FragColor?
+Since we're just setting the color to orange as a single color,
+this one doesn't need to receive a uniform variation right now,
+so we just set the color to orange like this: R, G, B, Alpha
+So this is a simple fragment shader that always paints only orange color to the pixels
+Okay, then the next thing to do is to compile the shader, paste
+the shader source code, use gl.createShader, and then gl.compileShader
+Actually, there is nothing more to see here,
+so I will just roughly finish it here and move on. The same goes for gl.createProgram
+If you put in the sources,
+it will call gl.compileShader above, attach the program,
+link it, and then return it
+The Shader program is passed the Vertex
+Shader Source and Fragment Shader Source that we created earlier as strings,
+and we received the program from gl.createProgram
+After that, we have the linked one. Next, this is the VAO, VBO part,
+which is the vertices array, and our CPU sets the coordinates of 3 vertices
+Next, we need to create a VAO,
+then bind it, and then create a VBO, right? After creating it,
+we bind it, and then we use gl.bufferData
+to copy the contents of the Vertices
+Array to the current VBO
+Then, we use gl.vertexAttribPointer
+to tell the shader how the VBO is structured
+So, this location 0, 0 is a triple, X, Y, Z,
+and it's of type gl.FLOAT. Next, 0 is the stride
+If you put 0 in, it will be calculated automatically. 0 is the offset
+So, it means that it starts from the beginning without any blank spaces
+After that, you need to use the program
+linked to the shader with gl.useProgram(shaderProgram)
+Then, use the command to use it, then go to render, clear it,
+then do vao bind again,
+and then use gl.drawArrays to draw it with
+the primitive gl,TRIANGLES
+Then you can call render
+Okay, so let's run this program here
+If you go to html and
+right-click and select Open with Live Server,
+the program will start at 500 x 500
+But since we resized it a little strangely,
+The moment I move it,
+it looks like this, and the aspect ratio is off
+This needs some improvement, so I drew an orange triangle

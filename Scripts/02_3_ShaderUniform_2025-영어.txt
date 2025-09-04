@@ -1,0 +1,383 @@
+﻿I will lecture about ShaderUniform and ShaderClass
+We will use the standard in the form of ES modules,
+and we have written the functions that will be continuously used in this distributed source
+code as library functions in the util directory
+So, util.js, shader.js, texture.js, etc. are such utilities
+These library files are written in compliance with the esModule,
+esM, and esSix standards
+This is a standard module system that allows you to import or export functions, classes, etc
+using the import and export keywords
+In this example, a function called add(a,b)
+is written in a library called myutil.js
+By adding the export keyword in front of the function keyword,
+this function can be imported
+and used in other JavaScript files
+For example, if you import add from main.js,
+you can do it like this: import { add } from "./myutil.js" Of course,
+if you use * instead of curly brackets and function
+name or class name, all exported
+functions or classes under myutil.js will be imported
+And you need to remember that when including main.js in HTML,
+that is, the import side, you need to set the type to "module" type
+Let's take a look at program 04 ShaderUniform
+Here, you can see that the color of the triangle changes continuously over time
+By continuously changing the value of the uniform
+variable and sending it, the shader draws this triangle with different colors
+Another function I created was called ResizeAspectRatio,
+and I used that function to resize
+while maintaining the aspect ratio
+Then again, I used the function
+called CreateProgram under shader.js
+Then let's look at the source code together
+Let's start with 04_ShaderUniform.html
+Everything else is the same. Here, you can see that the script type is module
+This is in 04_ShaderUniform.js, where we have a utility util.js,
+which exports several functions
+So, in order to be able to use these utility functions,
+I said that the type must be module
+So you need to include the script by setting the type to module
+Next, let's look at 04_ShaderUniform.js
+Here, we've taken something called resizeAspectRatio from util,
+and then we'll take a function called createProgram from shader.js and use it
+Creating canvas and WebGL context is the same,
+and the canvas dimension is set to 600 x 600
+Next, this resizeAspectRatio is a function in the utility
+We imported it earlier. So, first set originalWidth as canvas.width,
+canvas.height, then calculate aspectRatio,
+then receive newWidth as innerWidth, innerHeight of the new window,
+then check whether it is bigger
+or smaller than aspectRatio, recalculate newWidth,
+then reassign it to canvas, and re-set viewport, and so on,
+all by calling this function
+Then, set glViewport to the area of the entire canvas
+and then set clearColor as well
+Here, vertexShaderSource and fragmentShaderSource
+are still assigned as Strings
+Next, here too, we did not use the Shader class,
+but there is something called createProgram
+We used only that in shader.js to bring in the shader program like this
+Next, float32Array vertices are currently
+representing the coordinates of three vertices
+in the same way
+Then, create a vao and bind it, then create a vbo and bind it
+to copy the vertices to the vbo. Here, the index is not used
+So, do
+gl.vertexAttribPointer and gl.enableVertexAttribArray
+the same way, and then do gl.useProgram the same way
+Next, this shows how to pass a uniform variable
+Using gl.getUniformLocation, we get the location of
+the uniform variable
+called uColor and put it in the uColor location
+Shall we go up here?
+Right now, the only uniform variable is here among the vertex
+shader and fragment shader
+uniform vec4 uColor, that is, there is a variable called uColor in the fragment shader
+I'm going to put some value in there,
+so I'm going to find its location and bring it here
+Then, what value should I pass here?
+So, if you go to the render function, first
+do clear, and then t is Math.sign's time/1000 + 1
+This time is passed here as the time of render
+This parameter is the elapsed time since the program started
+The elapsed time is in milliseconds
+That's in thousandths of a second
+So if you divide this time by 1000, it becomes seconds
+I calculated the sine value in seconds, added 1 to it, and divided it by 2
+Our sine value now goes like this. It has a range of -1 to 1, the value
+So, if we normalize this from 0 to 1, since it's -1 to 1,
+we first raise the range from 0 to 2
+by +2, and then divide that in half,
+and it will normalize to the range of 0 to 1
+So we get time t, and then here we have 1.0 times 1 - t
+plus 0.0 t, which is the red component,
+which is 1-t, and then
+t, which is normalized to a value from 0 to 1
+This is usually done by blending the values here and there
+So if t is 0, it is 1.0, and this side becomes 0
+Then, if t is 1, this side becomes all 0, and yes, this side also becomes 0
+So, if 0.5, 1, and t is 1, then this side becomes all 0, and only 1 remains
+Then, if t is 0, this side becomes 0.5 and this side dies
+So red is also a value that changes smoothly from 1.0 to 0
+Then, green also changes smoothly from 0.5 to 1,
+and blue increases from 0 to 1.0 times t
+Alpha remains 1
+and the color continues to change
+So where do we send this color? We found the location earlier
+We found the location of the uColor uniform variable,
+and since it's gl.uniform4fv,
+it means it's a 4-dimensional vector, a 4-dimensional float vector
+So we send this color to the uColor location
+Originally, you had to find the location in a complicated way like this
+and send it like this, but if you look at the program later,
+you can see that it was made much easier to send it
+by using something called the Shader class
+You can see that in the next program
+Okay, so anyway, let's do this and then draw it
+Bind the VAO with gl.bindVertexArray,
+then use gl.useProgram, and then draw it with gl.drawArray
+When drawing the VBO directly, you use the primitive
+called gl.TRIANGLES and draw it with 0, 3, etc
+Next, there's something called requestAnimationFrameRender
+What this means is that if you call this,
+it will continue to call this render repeatedly
+So, for animation, you need to add
+this requestAnimationFrame here
+Then, normally, call requestAnimationFrame(render) at the end
+to execute render for the first time
+After that, requestAnimationFrame will be called again to repeat the same thing,
+and the time t will change
+Okay, so let's run the program
+So if you look here, you can see that the triangle is changing color
+You can see that the color is changing. This is the program
+Web browsers often perform local, or client, operations in parallel
+(multiple operations simultaneously)
+This is to provide web services to as many users as possible in the shortest possible time
+For example, typical tasks include reading files within a local computer
+or writing to files
+These functions are called Asynchronous Operations
+or Async Functions
+In this picture, we can see that x + 2 is assigned to x
+Then, these general statements that assign y - 1 to y
+are performed sequentially one by one
+That is, the instruction after this can only start once
+the previous instruction has finished
+However, if there is an async function like readfile,
+it starts once and then proceeds to the next instruction,
+and you don't know when the read file will end
+If this doesn't cause any problems, then it doesn't matter,
+but in some cases, you need to keep track of the order
+in which async functions end and start
+In this example, the vertex shader source file
+called vertex.glsl must be read in its entirety to compile the source
+If you try to compileShader before readFile is finished
+as shown in this figure, an error will occur
+Even the next readFile operation that reads the fragment
+shader source can sometimes finish faster than the previous read file
+In this picture, we have the compileShader function
+that compiles the fragment shader, right?
+Here, another error occurs
+because we tried to compile without reading
+the Fragment Shader Source
+So, what measures are needed to enforce
+ordering for these Async Operations?
+In our program source, ../util/shader.js,
+there is a function called readShaderFile,
+and inside this function,
+there are async function calls called fetch and response.text
+In order to prevent the two async function calls
+called fetch and response.text from operating asynchronously,
+we added the keyword await in front of the function name
+This will cause response.text to be executed after fetch is complete
+Since it contains async functions,
+the read shader file function itself becomes an async function,
+so the async keyword is added here
+Meanwhile, there is a function called initShader
+that calls the async function readShaderFile
+If you look here, you can see that
+both readShaderFile calls have await in front of them
+This way, all vertex shader sources are read,
+then the fragment shader source file is read,
+and once all of this is done, it moves on to return new
+So, since it contains two async function calls,
+the init shader itself becomes an async function,
+so we add the async keyword here too
+Lastly, when calling this initShader inside the main function,
+you must use the await keyword,
+and you must also add the async keyword to the definition before the main function
+If you look at the readShaderFile function,
+a library function in util/shader.js, fetch is executed within a try block,
+and if response.ok is false,
+an error occurs, such as there is no file to read in the file path
+In this case, create an error class and throw it
+Here we throw. And the rest of the try block is not executed
+In other words, if an error occurs,
+it skips to here and exits this try block
+If response.OK is false,
+In this catch block, we catch the error that was thrown earlier,
+then display the message "error reading file" and rethrow this error
+This thrown error must be caught somewhere later
+In the case of init shader, the readShaderFile library function is called twice
+If no error is thrown in readShaderFile,
+the Shader Class object is created normally and returned
+However, if an error is thrown in readShaderFile,
+initShader cannot catch this error, so the responsibility for catching
+it goes to the place that called initShader
+So let's go to the function before calling initShader
+Now open the try block in the main function and call initShader
+If there is an error object that initShader could not handle,
+it is caught in the catch block of main, and after displaying an error
+message and alert window, false is returned
+If there was no error in initShader, main will return true
+Anyway, main.then(success ... This will be executed, and success will be true
+or false returned by main
+If (!success) { .... } This block simply terminates after an error message
+in case main returns false,
+and if main returns true, main.then(success .... )
+will do nothing and end the program
+Then, in main.then(success ...), when will this catch
+block be executed?
+There are three cases: first,
+if the main function itself cannot be executed; second,
+if an error occurs inside the then block; third,
+if an unhandled error occurs during the asyncronous operation
+In all of these cases, the last catch catches the error
+and notifies that an error has occurred
+We talked about async functions and exception handling,
+but these concepts are not easy
+So, we need to look at it from the perspectives of system, network, and distributed system
+We don't need to go into detail about this in computer graphics class
+But anyway, since we have to do web programming and we tried to read a file, that is,
+we tried to read a shader file, this error can occur
+These are the things that become necessary
+So, here, we can just roughly see that we're going to continue writing like this,
+and we can use this to do that
+and focus more on the rest of the graphical aspects
+Next, let's look at the Shader class
+I created a Shader class under ../util/shader.js,
+defined it, and exported it
+When creating this Shader class object, Constructor's gl, WebGL context
+Then, vertexSource and fragmentSource
+are passed to create it
+Yeah, actually, the process of creating shaders was very complex, long and complicated
+So I gathered all of those things together and covered up all the complicated stuff
+Think of it this way. Now, there are several member functions here
+InitShader is another version of the Shader Initialization function
+that only takes Shader sources as parameters
+So here is a function that initializes initShader without receiving gl context,
+and what is use?
+This is the member function
+used when telling the Shader program to use it
+Next, there is something called SetAttribPointer,
+and here, name is the variable name
+That is, the shader attribute variable name is entered,
+and the rest is the same as this AttribPointer function
+Then there are
+several versions of uniform setters
+These are functions that pass a variable name
+and value to a uniform variable for each type
+So when using this shader class,
+first readShaderFile and read these shaders like this
+The vertex shader is read, then the fragment shader is read,
+and then these sources are combined with the GL context
+to create a shader object using new
+Then, all the complicated things inside will be hidden
+Then, in the shader, there was the setAttribPointer function
+So here apos is the first attribute variable (of the shader) and
+like we did before, we have 3 and then gl.FLOAT
+Then normalize false, Stride 0
+This said that Stride can be set to 0
+The next feature of the program that will come out next
+is that there is one more attribute called aColor,
+and the position and color are passed at the same time
+So, for color, you can specify the attrib pointer like this
+Next, before rendering, use shader.use,
+which means use this shader. Then,
+when passing a uniform variable value when necessary,
+pass the name of the uniform variable
+followed by the value, like this, if it is a float, pass it like this
+As you can see earlier, you can pass 2D vectors, 3D vectors,
+4 x 4 matrices, and various other things
+Finally, let's look at the program 05_ShaderClass
+Here, this program uses the Shader class
+We've just started using it,
+and now we'll be using it very well in all subsequent programs
+So when creating a Shader program, I will use the Shader class,
+and then I will save the Shader source as independent files
+and then read and import them
+This is much more convenient than creating the shader source as a String
+Because you can edit it in the editor, it becomes much more convenient
+Next, as I mentioned earlier,
+the second attribute color is included in the vertex data
+and passed to the shader as attribute data
+So if you look here, that vertex here is now blue
+Here is green, here is red
+These colors are now passed to the vertex attribute as an attribute variable,
+and what is passed to this attribute is ultimately interpolated for each pixel
+in the fragment shader, right? Here,
+the colors are now interpolated, right?
+So, by interpolating the color values,
+we draw a triangle that gradually changes like this
+Then let's look at the source code
+Let's look at the 05_ShaderClass.html code
+There is nothing else, and I made the type a module
+and included the 05_ShaderClass.js JavaScript File
+If you go to JavaScript, you will see that ResizeAspectRatio has been imported,
+and util.js, and then under shader.js,
+there is a function called ReadShaderFile
+Shader is a Class. I have set it to import the Class
+If you look at the global variables, canvas and gl are the same
+Now I have set shader to null and vao to null
+I set this shader to null because I will use the shader later,
+so I declared a variable using let
+Then there's something called InitWegGL,
+which is just a routine that we do as we always do
+So I checked if gl got the context correctly
+and then made the canvas width and height 700 x 700 this time
+I set the viewport, set the clear color, and set it to return true
+And GL is supposed to return false if the context is not properly obtained
+Next, there is something called setupCanvas, and here, there is something called resizeAspectRatio,
+which is under utl.js
+After doing that, grab the viewport and grab the clearColor again
+Actually, I didn't need to go back in because I did it here, but I think I made a little mistake
+Next, in the SetupBuffers, there are two things
+we need to look at: position and color
+The first Vertex contains the position, that is, 3D coordinates,
+and then RGB is immediately included
+Then this is the coordinate of the second vertex, then RGB
+The first one will be red, the second one will be green, and the third one will be blue
+So, since we have created a vertices array like this, we just need to select it well,
+create it well, and send it to the shader as an attribute
+I created a VAO, bound it, then created a VBO,
+a Vertex Buffer, bound it,
+and then copied the bufferData and sent it to the VBO
+So, if you look at the data structure of one Vertex,
+you can see that there are 6 Float values in the Vertices
+Array above, XYZ, RGB
+The size is 6. 6 is included,
+and then the color data starts from here
+So the offset of this color
+data will be 3 times Float32Array.BYTES_PER_ELEMENT,
+and then the offset of the position data will be 0
+So here, setAttribPointer is doing two things: aPos,
+then aColor, and the number of each is 3, and the stride
+here is 6 * Float32Array.BYTES_PER_ELEMENT
+Why is this 6? Because the data
+corresponding to this one vertex is position,
+then color, a total of 6,
+the stride needs to be multiplied by 6
+Then the offset, position, becomes 0, and what about the color?
+Here 3 times Float32Array.BYTES_PER_ELEMENT
+This will be the offset. This means that the color starts after this amount of space
+So, you can set the buffer like this
+Now, if you look at the render function,
+you can do the same thing by clearing it,
+then binding it to VAO, and then using gl.drawArrays to draw the triangle
+Then we ask the browser to call render(vao) for animation,
+which is like requestAnimationFrame(() => render(vao))
+So this is now requestAnimationFrame, which does the same thing, right?
+So, it will be in the form of calling this render function
+Next, here, async is attached,
+and here, initShader(), await async were all explained earlier
+So, it becomes a part that reads the vertex shader and fragment shader, reads the source,
+and here it is new Shader(...)
+This is the part that creates the Shader class object
+So in main, we initialize the shader with init shader,
+and while awaiting, we use setupCanvas, setupBuffers, shader.use()
+Here, we use the use function of the shader we created
+Then, we do render(vao), return true, and if an error occurs,
+it will be caught in the catch block
+Next, the WebGL-related initialization was gathered in the initWebGL function
+Then, main, then, catch, etc
+all terminate the program if it is not success
+If it is not success, it simply terminates, and if an error occurs,
+we say that an error occurred while running the program,
+and in catch,
+we receive it and print the console error and terminate
+I explained this
+It's a bit complicated, but this is just the example for now
+It gets a bit more complicated later on, and from the later ones on, it gets a bit simpler
+So, if we know that there is this structure,
+it will probably be a little easier to understand starting with program 06
+I guess I'll have to see the program running
+Yes, I gave the colors green,
+red, and blue at the same time to draw a triangle like this

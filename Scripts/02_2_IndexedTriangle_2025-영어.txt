@@ -1,0 +1,467 @@
+﻿Let's start with Indexed Triangle
+
+This time, instead of drawing a triangle using the vertex coordinates directly,
+
+we will draw it using the index
+
+I'm trying to draw a rectangle using two triangles here
+
+But if we think of a triangle as having three vertex coordinates like before,
+
+there should actually be six coordinates, one, two, three, one, two, three
+
+But now, if we do 0 and 2, the coordinates will be entered twice
+
+So, to prevent that, we don't duplicate overlapping vertices here,
+
+and we only set the coordinates for 4
+
+We have four, and then we have a separate index, an index array
+
+So 0, 1, 2 is now the first triangle, and 2,
+
+3, 0 is now the second triangle
+
+So I'm going to talk about how to draw using this index
+
+and then the vertex coordinates at the same time
+
+So we use something called Vertex Element Array Buffer,
+
+but before that,
+
+we first create a Vertex Array Object VAO like we did before
+
+And then we bind
+
+Then, the Vertex Buffer Object, VBO, is created in the same way
+
+Here we used gl.ARRRAY_BUFFER
+
+This gl.ARRAY_BUFFER is a buffer that contains coordinate values
+
+So, I said to bind and then copy the vertices array
+
+And I said that I use gl.vertexAttribPointer
+
+to determine where the shader should go,
+
+and this is exactly the same code as the one I programmed first
+
+There's one more step. This time, gl.ELEMENT_BUFFER
+
+That is, we create something called EBO, and this Element Buffer is the Index Buffer
+
+So here, we used gl.createBuffer,
+
+which is the same as creating a VBO
+
+The function is the same. So, using glCreateBuffer,
+
+we create the Element Buffer and Index Buffer,
+
+and then we bind them
+
+If you look here, instead of gl.ARRAY_BUFFER,
+
+we used gl.ELEMENT_ARRAY_BUFFER
+
+Yes, that's why it's indicating the index, not the vertex position
+
+So, we bind, and then copy the buffer data,
+
+the array that had indexes 0, 1,
+
+2, 2, 3, 0, and copy it to the buffer
+
+So the next program we're going to look at supports
+
+rendering in both of those forms,
+
+either it'll show you a rectangle filled with orange,
+
+or if you press the F key, you'll see two triangles in a line
+
+So, in the end, there have to be two shaders
+
+One shader paints the image orange,
+
+and the other shader makes it appear only as lines
+
+While one shader would be sufficient,
+
+I intentionally kept the two shaders separate
+
+So the Vertex Shader Source
+
+will be shared between two shader programs
+
+Since the vertex coordinates are all the same,
+
+there is only one source for this
+
+And since it is the source of the fragment shader
+
+that fills the fragment shader source triangle in orange,
+
+this is separate, and then the fragment shader source gray is the source of the fragment shader
+
+that draws it with a gray line
+
+So, there are two sources for the fragment shader prepared
+
+So the shader program is program1,
+
+the vertex shader source is orange and the second vertex is gray
+
+By linking these two things respectively, we create program1 and program2
+
+Next, let's take a look at the rendering part
+
+Then, in this render, we need to clear it first, right?
+
+Clear gl.COLOR_BUFFER_BIT, and Is FillMode
+
+has whether Fill Mode is true or false
+
+So if Fill Mode is true,
+
+it's painted in orange, otherwise it's drawn like this with a line
+
+So, I draw two triangles in Shader Program 1 orange and fill them
+
+So gl.useProgram is called program1
+
+And then we fillIndexBuffer
+
+with gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER)
+
+Bind the index and then call gl.drawElements
+
+DrawElement means, previously we drew the vertex
+
+coordinate buffer vbo directly,
+
+so we used the function gl.drawArrays there,
+
+but here we use the function gl.drawElements
+
+So the gl.TRIANGLES primitive is the same,
+
+and fillindices is the size,
+
+the number of indices
+
+Then gl.UNSIGNED_SHORT is the type, and then 0 is the offset
+
+This will draw the triangle using indices
+
+Two triangles will be drawn
+
+Then, if isFillMode is false,
+
+this will only draw the edges of the two triangles
+
+So, use Shader program2,
+
+so use gl.useProgram(program2), and then do
+
+gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, lineIndexBuffer)
+
+
+
+Next, gl.drawElements uses gl.LINES, this time primitive
+
+Then, the number of indices, then the type, then the offset
+
+You can draw it like this
+
+So, in summary, when drawing VBO directly,
+
+you should know that you should use drawArrays, and when using index,
+
+you should use drawElements
+
+Next, we need to look at the 'resize' Event Listener again
+
+to maintain the aspect ratio
+
+Last time, when we drew the triangle in program 2,
+
+if we resize it, the triangle gets distorted
+
+That's because the aspect ratio isn't maintained
+
+So, in order to maintain that,
+
+we first want to use this aspect ratio
+
+So, CANVAS_WIDTH and CANVAS_HEIGHT are now constants
+
+that we have programmed in advance to represent the original
+
+width and height of our canvas
+
+We have set them to const,
+
+and we have set the width divided by the height as aspectRatio
+
+This is how I calculated it,
+
+and newWidth and newHeight get windows.innerWidth and innerHeight as before
+
+I brought it here, but we need to change it
+
+so that it fits this aspect ratio
+
+So if newWidth divided by newHeight is greater than the aspect ratio,
+
+In this case, newWidth / newHeight
+
+is larger than CANVAS_WIDTH / CANVAS_HEIGHT,
+
+so the numerator is too large. NewWidth is too large
+
+So if we recalculate new-width,
+
+new-width becomes new-height times aspect ratio
+
+Now, you know the proportional formula A : B = C : D,
+
+which is "what's inside times what's outside times"? Proportionality
+
+Using that, we can calculate the new newWidth
+
+Then, if the denominator (newHeight) is too large, it is smaller than aspectRatio
+
+In this case, newHeight is too large
+
+So, we recalculate newHeight by dividing newWidth
+
+by aspectRatio
+
+So, assign the newly calculated newWidth
+
+and newHeight to the width and height of the canvas,
+
+and then set the viewport to the entire canvas again
+
+and call render
+
+So, let's take a look at program number 3, HelloTriangleIndexed
+
+It draws two triangles and draws one rectangle
+
+At first, it is filled with orange,
+
+so when you press the F key, the rendering goes to line mode,
+
+and when you press the F key again, it goes to fill mode and back again
+
+Let's take a look at the program source code
+
+Let's run it from 03_HelloTriangleIndexed.html
+
+When we open Open with live server and run it,
+
+we get a filled Rectangle like this, right?
+
+If you press the F key here, you can toggle between the two
+
+rendering modes like this
+
+You can see it going back and forth every time you press the F key
+
+Next, let's try Resize. If we move
+
+Resize like this, it won't fit the entire window,
+
+but will maintain this ratio, right? You can see that it maintains this ratio
+
+so that it always maintains this square shape
+
+Let's take a look at the JavaScript source code
+
+So I read the canvas. Then I read the WebGL2 context
+
+Here, I set both CANVAS_WIDTH and CANVAS_HEIGHT
+
+to 700, 700
+
+And initially, we set canvas.width as a constant,
+
+and here is the event listener that we wrote earlier
+
+So, since the ratio of 700, 700 is 1:1,
+
+I adjusted the newWidth and newHeight to an appropriate size to maintain that ratio
+
+This is what I did again in the note
+
+Next, this is the part that sets the viewport at the beginning
+
+and the part that sets the clearColor
+
+Next, let's take a look at the vertexShaderSource
+
+This is now aPosition, which only receives one position. Yes,
+
+location = 0 is missing here, but when there is only one attribute, it automatically becomes zero
+
+So, you can remove location = 0
+
+Then, it is set to go as gl_Position = aPosition
+
+Then in the fragment shader,
+
+FragColor is this orange fragment shader
+
+In this case, the orange color
+
+is set to the frag color,
+
+and then the gray color below is set to the frag color
+
+Next, compileShader, createProgram. This is the same as before
+
+So we created two shader programs
+
+You can see that the vertexShaderSource is the same for both,
+
+and one has shadeSourceOrange, and the second has shadeSourceGray,
+
+and we used gl.createProgram
+
+Then, only four coordinates were given to the Vertex array
+
+CPU, avoiding duplicates
+
+Then, the indices (0, 1, 2), (2, 3, 0) were given
+
+Then, when you draw with a line, it's a little different
+
+At this time, you have no choice
+
+but to draw the index repeatedly
+
+(0, 1) and then (1, 2) and then (2, 3) and then (3, 0) and then (0, 2) and so on
+
+So, when it's gl.LINE mode, the index is given differently like this, right?
+
+So, what I'm saying is that we need to create two index buffers
+
+Then, we create a VAO and bind it,
+
+create a VBO for coordinates, a Vertex coordinate, bind it,
+
+and then we move it with bufferData, and then, vertexAttribPointer,
+
+and then do the same thing, and then fillIndexBuffer,
+
+and then lineIndexBuffer,
+
+and we said that there are two Index Buffers
+
+So, bind each one
+
+and then move the index again with gl.bufferData
+
+Then, I set IsFillMode to True, but I used let here, right?
+
+The reason I used let is because every time I press the F key on my keyboard,
+
+it should toggle from true to false
+
+So this guy can't use const
+
+Since the value needs to change, in that case,
+
+you can just use let as a normal variable
+
+For your information, in the past,
+
+JavaScript used to use var a lot,
+
+but var is very unstable and has many disadvantages
+
+I will skip the detailed explanation here, so
+
+please use const or let
+
+Next, on the render side, when in Fill mode,
+
+use the program1 from before to draw,
+
+and then use Draw Element to draw using Fill Indices
+
+Then, if the Is Fill mode is False,
+
+you can draw it with a line using program2, gl.LINES, and line indices
+
+Then I added one more event listener called keydown
+
+This is an event processing handler routine that is executed when the keyboard is pressed
+
+So in this case, this is now a parameter of the anonymous function
+
+When an event occurs, we console.log it here
+
+and print out what event was received by pressing a key
+
+Then I changed it to toLowerCase in case it comes in uppercase
+
+So, if the event's key is 'f', fillMode is assigned to the opposite of the current isFillMode, so
+
+if true, it is false, and if false, it is true
+
+So, we can show the console log again that the rendering mode has changed
+
+and call the render again
+
+And finally, we need to call render normally
+
+So in this order, there are functions inserted here and there
+
+There is a function call right after that, so it might be confusing,
+
+but you can think of it like this: the function can be placed anywhere
+
+Even now, it's in the middle
+
+and it's in the front, right?
+
+But this flow is the same from top to bottom,
+
+so here, we call render and the program ends
+
+Rather than ending, it's maintained here. Yes,
+
+so there are a few console logs here,
+
+so let's go to developer mode while running this
+
+I opened the console window like this by pressing the shortcut
+
+key Control Alt-Ctrl-i
+
+Now, several things are already coming out, so I reloaded it and ran it
+
+Then, if you press the f key here,
+
+the Key pressed is now F and the rendering mode is Line. It is printed like this
+
+The unchecked part here is because this appears whenever the timing is long,
+
+so you don't have to worry about it
+
+So, if you look here, keypressed event.E is printing out that F has been entered,
+
+and then it's printing out
+
+whether the rendering mode is current line or fill
+
+So, every time we press F, we can see something new appearing like this
+
+So, you can use this and use console.log for debugging
+
+and it can help you with various coding
