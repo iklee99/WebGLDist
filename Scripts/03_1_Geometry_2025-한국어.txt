@@ -1,0 +1,336 @@
+﻿이번 시간에 공부할 내용은
+수학적인 그래픽스 이론 중에 vector 와 geometry (기하) 에 관한 내용입니다.
+많은 것들이 매우 기초적인 것들로서,
+이 내용들은 여러분들이 이미 다 알고 있는 내용일 수 있습니다.
+그렇다 하더라도, 복습하는 의미에서 다시 한번 보도록 하죠.
+오른손 좌표계는 일반적으로
+수학 수업 시간에 우리가 사용하는 좌표계입니다.
+우리가 이 과목에서 사용하게 될 OpenGL API에서도
+오른손 좌표계를 사용하고 있습니다.
+CG에서는 일반적으로 y 축을 머리위 방향으로 하고 있습니다.
++z 축은 화면 바깥으로 나오는 방향입니다.
+주먹을 완전히 쥐었다가, 오른손의 엄지, 검지, 중지를
+서로 수직이 되도록 펴보면,
+그 순서대로 각각 오른손 좌표계의 x, y, z 축 방향을 가리킵니다.
+왼손 좌표계에서는 z축이
+화면 안쪽 방향을 가리키고 있습니다.
+CG에서는 viewing transformation 과정에 등장하는
+camera 좌표계에서
+이 왼손 좌표계를 사용합니다.
+여기에 대해서는 추후에 공부할 것입니다.
+World 좌표계는 우리가 그려낼 CG 장면안에서
+유일하게 존재하는 좌표계 입니다.
+모든 object들이 이 world 좌표계에 배치되어
+한 장면에 보여집니다.
+Local 좌표계는 주로 각 part 또는 object를
+모델링 (디자인) 할때 사용되는 좌표계 입니다.
+이렇게 기울어져 있는 물체를 모델링할 때에도
+보통 초기에는 똑바로 원점을 중심으로 똑바르게 모델링을 하게 됩니다.
+local 좌표계는 특히 인체와 같이
+관절들로 연결된 multi-linked body를
+애니메이션할 때 중요한 역할을 합니다.
+이 경우에 그림에서 빨강색 점의 local 좌표는 (3, 1) 이었는데,
+물체를 원점을 중심으로 회전한 후,
+translation하면 그 점의 world 좌표는 (4, 5)가 됩니다.
+나중에 우리는 local에서 world 좌표로의
+변환에 대해 공부할 것입니다.
+Vector는 방향과 크기(magnitude)를 가지고 있습니다.
+예를 들어 점 P1에서 P2로 가는 vector는
+P2 - P1으로 구할 수 있습니다.
+벡터는 방향과 크기는 있지만 고정된 위치(position)는 없습니다.
+따라서 그림에서의 이 세개의 벡터들은 모두 동일한 벡터입니다.
+반면에 scalar는 하나의 컴포넌트 만으로 구성된 것으로
+방향(direction)이 없고 크기(magnitude)만 가지고 있습니다.
+예를 들면 3 과 235.5 는 스칼라 입니다.
+두 벡터 V와 W가 있다고 가정합시다.
+V와 W의 합과 차는 이렇게 계산하면 됩니다.
+두 벡터의 합은 새로운 벡터를 나타내는 데,
+이러한 두 가지 방법으로 그릴 수 있습니다.
+a - b 벡터는, a와 b의 tail을
+같은 점으로 일치시켰을 경우,
+b 벡터의 head에서 a벡터의 head로 가는 벡터입니다.
+a - b는 a + (-b)와 같으므로 이와 같이 그릴 수도 있습니다.
+이 두 벡터 a+(-b)와 a-b는 다른 위치에 있기는 하지만,
+방향과 크기가 같으므로,
+정확히 같은 벡터들 입니다.
+벡터의 magnitude (크기)는 length, size, norm과 같이 불리기도 하는데,
+꼬리에서 머리까지의 길이를 말하며,
+각 component들의 제곱의 합의 제곱근입니다.
+Normalization (정규화)란 벡터의 방향을 유지하면서
+크기를 1로 만드는 것을 말합니다.
+벡터의 각 component를 그 magnitude로 나누어주면
+normalize 할 수 있습니다.
+특히, magnitude가 1인 벡터를 unit vector라 부릅니다.
+두 벡터 V와 W의 dot product V.W는
+다음과 같이 정의됩니다.
+두 벡터의 각 콤포넌트의 곱의 합입니다.
+여기서 theta는 두 벡터가 이루고 있는 각을 말하는데,
+dot product의 값을 아는 경우,
+arccos 함수를 이용하여 theta를 구할 수 있겠습니다.
+dot product의 결과는 scalar 값으로서
+그래서, dot product는 scalar product, 
+또는 inner product 라고도 불립니다.
+특히 자기 자신과의 dot product v.v 는
+그 vector의 크기의 제곱, ||v||^2 이 됩니다.
+어떤 벡터 v를 다른 벡터 u위로 프로젝션할 때,
+프로젝션 vector w를 구하는 과정을 보도록 하겠습니다.
+먼저 cosine의 정의에 의해 w의 크기는
+v의 크기 곱하기 cosine theta로 나타낼 수 있습니다.
+또한, u,v의 dot product의 정의에 의해
+w의 크기는 u.v 를 u의 크기로 나눈 것이 됩니다.
+따라서 u가 만약 unit vector라면
+w의 크기는 u.v가 될 것입니다.
+w의 방향은 u와 같고, 그 크기가 정해졌으니
+w는 이와 같이 구할 수 있습니다.
+이제 두 벡터 사이의 angle theta의 크기와
+dot product간의 관계를 보도록 하겠습니다.
+dot product값이 양수일 때에는
+cosine theta 값이 양수이므로
+theta의 크기는 0과 90도 사이일 것입니다.
+즉, theta는 예각입니다.
+dot product가 음수라는 것은
+cosine theta 값이 음수,
+즉, theta는 크기가 90도를 넘어서는 둔각일 것입니다.
+dot product가 정확히 0인 경우는
+두 vector가 수직, 즉, theta가 90도라는 뜻입니다.
+많은 graphics 연산에서
+이 관계가 아주 요긴하게 사용될 것입니다.
+여기에 하나의 다각형이 있습니다.
+이 다각형과 수직인 normal vector는 어떻게 구할 수 있을까요.
+normal vector N은 그 다각형 위의 두 벡터
+V1과 V2의 cross product로 구합니다.
+유의할 점은, V1, V2, N이
+right-handed 좌표계를 형성한다는 것입니다.
+만일 V2 cross V1을 계산한다면,
+그림의 N과는 반대 방향인 normal vector가 구해질 것입니다.
+그렇다면, V1 과 V2의 cross product는 어떻게 구할까요.
+Cross product는 이와 같이 determinant 로 계산합니다.
+3 x 3 determinant는 이렇게 2 x 2 determinant들을 이용하여 구합니다.
+여기서 i, j, k는 각각 x, y, z축 방향의 unit vector입니다.
+Cross product의 계산 결과는 scalar가 아니라 vector입니다.
+그래서 cross product는 vector product 또는
+outer product라고도 불립니다.
+Cross product vector의 크기는 이와 같은 공식으로 구할 수 있습니다.
+A x B = C 일때 C의 크기는 (A의 크기) x (B의 크기) x sin(theta) 입니다.
+여기서 theta는 A와 B vector 사이의 각입니다.
+때문에, A와 B가 unit vector 인 경우 C의 크기는 sin(theta)가 됩니다.
+Vector를 컬럼 vector 또는 로우 vector로 나타낼 수 있으나, 보통은 컬럼 vector 표현을 더 많이 사용합니다
+매트릭스 M과 vector v의 product, Mv는, 또 다른 vector w가 됩니다
+Dot product 에이 dot b는, 에이티와 b의 곱으로 나타낼 수 있는데
+여기서 에이티는 에이의 트랜스포우즈로서 로우 vector 표현입니다. 
+
+Line (직선) 은 무한한 직선을 말합니다.
+시작과 끝점이 정해져 있지 않습니다.
+Line segment (직선분) 는 시작과 끝점이 분명히 주어지는 경우이며,
+유한한 길이를 가집니다.
+시작점만 주어지고 끝점이 없는 경우는 특별히 ray라고 부릅니다.
+2D line의 일반 implicit form 즉, 음함수꼴은
+f(x,y) = ax + by + c = 0 형태입니다.
+두 개의 점이 주어졌을 때의 two points form은 이와 같습니다.
+두 점 p1과 p2가 주어졌을 때,
+line의 two points parametric form은
+C(t) = (x(t), y(t)) 로 나타냅니다.
+여기서 t는 parameter 이며,
+infinite line 이므로 t의 범위도 마이너스 무한대로 부터 무한대 까지 입니다.
+x(t) 는 x1 + (x2 - x1)t 이고,
+이를 x1과 x2에 관해 정리하면 x1(1-t) + x2 t 인데,
+parametric line C(t)의 x component의 식 입니다.
+마찬가지로 y(t)는 y component의 식 입니다.
+즉, C(t)는 x(t)와 y(t)가 모인
+vector form으로 볼 수 있습니다.
+t가 0일때 C(0)는 (x1, y1), 즉 p1이 됩니다.
+t가 1일때 C(1)은 (x2, y2), 즉 p2가 됩니다.
+다른 형태의 parametric form으로 point and vector form 이 있습니다.
+C(t) = p1 + vt인데, p1은 line위의 한 점이고
+v는 line의 direction vector 입니다.
+Two points form의 식을 t에 관해 정리하면
+points and vector form 이 됩니다.
+따라서, 다른 방법을 쓰더라도
+결국 같은 line을 나타내게 됩니다.
+Implicit 2D line f가 주어졌습니다.
+f의 x에 관한 편미분과,
+y에 관한 편미분을 계산하면,
+vector (a, b) 가 됩니다.
+이 vector는 line과 수직인 normal vector (법선 벡터) N 입니다.
+Tangent vector (접선 벡터) T = (-b, a)인데,
+normal vector와 수직인 vector 이고,
+line의 방향벡터와 같습니다.
+N의 y component b를 x로 가져오면서 마이너스를 붙이고,
+a를 y component로 보내는 형태가 됩니다.
+Normal과 tangent vector가 수직인 것은,
+dot product를 해서 0이 되는 것으로 확인할 수 있습니다.
+Parametric form C(t)로 line을 나타내었습니다.
+Tangent vector T(t) 는 x(t)와 y(t)를
+각각 t에 대해 미분하여 구할 수 있습니다.
+Normal vector N(t)는 T(t)와 수직이므로,
+이전 경우와 같이 쉽게 구할 수 있습니다.
+시작과 끝점이 정의되는 line segment일 경우,
+implicit form은 사용하기가 쉽지 않습니다.
+Two points parametric form이 가장 적당한데요.
+C(t) = (x(t), y(t)) 의 parameter t의 범위는
+명확히 0부터 1 사이로 정의합니다.
+x(t)와 y(t)는 무한 line과 같은 형태로 나타낼 수 있습니다.
+t에 0과 1을 대입하여,
+시작점 C(0)와 끝점 C(1)이 구해짐을 확인할 수 있습니다.
+하나의 예제를 보겠습니다.
+두 점 p1과 p2가 주어졌을때,
+두 점을 통과하는 implicit line을 구하려 합니다.
+Two point form의 공식으로
+쉽게 implicit line f(x,y) = 0 를 구했습니다.
+두 point로 부터 parametric line C(t)도
+쉽게 구할 수 있습니다.
+C(t)로 부터 tangent와 normal vector도 구했습니다.
+그런데, implicit form f(x,y)로 부터 Normal을 구해보면
+(a, b) = (2, -1)이어서
+parametric form으로 부터 구한 것과 반대 방향입니다.
+이것은 기하학의 방향 문제 입니다.
+즉, 주어진 두 점만으로는
+이 line의 normal 방향이 어느쪽인지
+결정할 수 없다는 것입니다.
+이 문제를 극복하기 위해 다른 정보들이 더 포함되어야 하는데,
+이에 대해서는 앞으로 더 알아볼 것입니다.
+중심이 (a, b)에 있고, 반지름이 r인 원을 고려해 봅니다.
+Implicit form으로는
+f(x,y) = (x-a)^2 + (y-b)^2 - r^2 = 0 으로
+표현할 수 있습니다.
+Parametric form으로는
+c(theta) = (x(theta), y(theta))
+= (a + r cos(theta), b + r sin(theta))로
+표현할 수 있습니다.
+중심이 (h, k)에 있고,
+두 축의 길이가 a, b인 타원의 방정식을 고려해 봅니다.
+Implicit form은 이와 같습니다.
+Parametric form은 이와 같습니다.
+이제 Circle과 line의 교차점 (intersection)을 고려해 보겠습니다.
+Circle은 implicit form으로 주어졌습니다.
+Line은 parametric 으로 주어졌습니다.
+x(t)와 y(t)를 circle의 implicit 방정식의 x, y 에 각각 대입합니다.
+이 방정식은 t에 관한 2차 방정식입니다.
+이 2차 방정식을 풀어봅니다.
+이 방정식이 두 개의 근을 가지는 경우
+line과 circle은 두 점에서 교차합니다.
+두 개의 t를 C(t)에 대입하면
+두 개의 교차점을 구할 수 있습니다.
+만약 방정식이 한개의 근 만을 가진다면,
+line은 circle과 한점에서 접하는 경우입니다.
+방정식의 근이 존재하지 않는 경우는
+line과 circle의 교차가 없는 경우 입니다.
+두 개의 object A와 B의
+교차를 구하는 연산에서,
+어느 한쪽을 implicit으로 하고,
+다른 한 쪽을 parametric으로 놓으면
+쉽게 교차를 구할 수 있습니다.
+원과 선분의 교차점을 구하는 예를 보겠습니다.
+먼저 선분은 양 끝점 p1과 p2로 주어졌습니다.
+두 점을 통과하는 parametric line의 방정식은
+L(t) = (x(t), y(t))인데
+x(t) = at + b, y(t) = ct + d 로 나타낼 수 있습니다.
+여기서 t의 범위는 0과 1사이로 한정됩니다.
+선분은 양 끝점 사이에서만 유효하기 때문입니다.
+원의 방정식은 implicit form으로
+(x-e)^2 + (y-f)^2 = r^2 으로 정의되는데,
+(e,f)는 원의 중심점이고 r은 원의 반지름입니다.
+이제 Line 방정식의 x(t), y(t)를
+circle의 방정식의 x, y에 각각 대입합니다.
+이를 정리하면,
+t에 관한 2차방정식 At^2 + Bt + C = 0 를 구할 수 있습니다.
+2차 방정식의 근을 구하기 위해
+판별식 D = B^2 - 4AC 를 고려합니다.
+D > 0 일때는 root t가 두개 나옵니다.
+D = 0일 때는 root가 하나 있습니다.
+D < 0 일때는 real root가 없 습니다.
+그러나 실근이 존재하는 두가지 case들에 대해서도
+근인 t를 계산한 후 이것이 0과 1사이에 있는지 확인해야 합니다.
+이 경우는 선분이 원 위에 걸치면서 D > 0 이고 두 개의 근이 있으며,
+두 개의 t가 모두 0과 1사이에 있는 경우입니다.
+이 경우는 D > 0 이면서 두 개의 t가 계산되긴 하지만
+선분이 짧아서 하나의 근은 유효하지 않은 경우 입니다.
+즉, 하나의 t는 0과 1사이에 있지 않습니다.
+이 경우는 역시 D > 0 이고 두 개의 t를 구할 수 있지만,
+두 개 모두 0과 1사이에 있지 않은 경우 입니다.
+이제 유효한 t만을 line equation L(t)에 대입하면
+유효한 교차점을 구할 수 있습니다.
+이번에는 3D의 line에 대해 알아보겠습니다.
+먼저 3차원의 두 점 p1과 p2가 주어진 경우입니다.
+Parametric line C(t)는 component
+x(t), y(t), z(t)로 표현되는데요.
+x(t), y(t), z(t)는 2D line 의 표현과 동일하게
+이렇게 구할 수 있습니다.
+t에 0과 1을 각각 대입해 보면
+두 점 C(0)와 C(1)이 구해짐을 알 수 있습니다.
+3D line의 point-vector form입니다.
+2D와 마찬가지로 C(t)는 한점 p1과 방향벡터 v를 사용하여
+p1 + vt 로 나타낼 수 있습니다.
+3D line을 implicit form으로 나타낼 때,
+하나의 방정식만을 사용하는 것은 불가능합니다.
+여기에서와 같이 두 개의 방정식으로 나타내어야 합니다.
+앞쪽의 것은 x와 y에 대한 방정식, 뒤의 것은 y와 z에 관한 것입니다.
+이제 plane과 plane patch에 대하여 알아보도록 합시다.
+plane과 plane patch는 구분을 해 주어야 합니다.
+plane은 무한해서 명시적인 범위가 없습니다.
+plane patch는 유한한 plane 조각입니다.
+plane patch에는 명시적으로 그 범위가 주어집니다.
+f(x,y) = Ax + By + Cz + D = 0,
+이것은 Implicit form의 plane equation입니다.
+여기에서 n = (A, B, C) 벡터는 plane의 normal vector 입니다.
+Plane equation을 유도해 보도록 하겠습니다.
+먼저 normal vector n = (A, B, C)가 주어졌습니다.
+또, plane 위의 한 점 p = (x1, y1, z1)이 주어졌습니다.
+이 때 plane은 n과 (r - p) 벡터가 수직인,
+모든 점 r = (x, y, z) 의 집합입니다.
+따라서, n과 (r-p) 의 dot product는 zero 입니다.
+이 식을 풀어서 다시 정리하면 Ax + By + Cz + D = 0 입니다.
+여기서, D = - (A, B, C).(x1, y1, z1) = -n.p 가 됩니다.
+3차원의 한 점 P1 과
+하나의 plane Ax + By + Cz + D = 0 가 주어졌다고 가정합시다.
+P1 이 plane 위에 있는지,
+plane의 밖에 있는지,
+혹은 plane 안쪽에 있는지를 판단해 보도록 합시다.
+P1 의 좌표 (x1, y1, z1)을 plane 방정식에 대입해서
+Ax1 + By1 + Cz1 + D 값을 계산해 봅니다.
+그 값이 0이면 P1은 plane위에 있습니다.
+만일 그 값이 음수이면, P1은 plane의 안쪽에 있습니다.
+만일 그 값이 양수이면, P1은 plane의 바깥쪽에 있습니다.
+바깥쪽이란, plane normal vector 가 가리키는 방향이 됩니다.
+세개의 점 p1, p2, p3를 모두 품고 있는 plane은
+어떻게 구할 수 있을까요?
+먼저 p1에서 출발하는 두 벡터 (p2 - p1)과 (p3 - p1)을 구할 수 있습니다.
+normal vector는 이 두 vector에 모두 수직이어야 하므로
+두 벡터의 cross product로 구할 수 있습니다.
+여기에서 두 vector (p2 - p1), (p3 - p1)와
+normal vector가 차례로
+x, y, z 방향을 이루는 오른손 좌표계를 나타낸다는 사실을
+우리는 기억하고 있습니다.
+Normal vector와 plane 위의 한 점이 있으니,
+plane의 implicit equation은
+방금 전 slide에서 처럼 구할 수 있습니다.
+이번에는 plane의 parametric form을 보도록 하겠습니다.
+plane r은 p + sv + tw 로 나타낼 수 있습니다.
+여기서 s와 t는 무한 구간인 pameter들입니다.
+p는 plane 위의 임의의 한 점입니다.
+v와 w는 p에서 시작되는 vector로서 서로 다른 방향을 가리키고 있습니다.
+v와 w는 반드시 수직일 필요는 없습니다만,
+서로 평행이면 안됩니다.
+즉, v와 w는 선형 독립 (linearly independent) 인 두 vector이어야 합니다.
+중심이 (xc, yc, zc) 에 있고,
+반지름이 R인 구의 implicit form f(x,y,z)는
+(x-xc)^2 + (y-yc)^2 + (z-zc)^2 - R^2 = 0 입니다.
+이 구와 line C(t)의 intersection을 구해보도록 하죠.
+앞서 이야기 했듯이 sphere는 implicit이고,
+line은 parametric으로 나타내었습니다.
+이렇게 하는 것이 intersection을 구하는 데는 좋습니다.
+f(x,y,z)의 x, y, z에 
+line의 x(t), y(t), z(t)를 각각 대입하였습니다.
+이 방정식은 t에 대한 2차 방정식이 되겠죠.
+따라서 0 또는 1 또는 2개의 근을 가집니다.
+그림으로 그려보면 이와 같습니다.
+line-circle intersection의 경우와 매우 비슷합니다.
+이제 공칠번 라인쎄그먼츠 프로그램을 보도록 하겠습니다. 
+레프트 마우스 버튼을 클릭하면 선분을 그리기 시작하고
+버튼을 놓지 않은 상태로 마우스를 움직이면
+변화하는 임시 선분을 계속 그리면서 보여줍니다. 
+누르고 있던 오른쪽 마우스 버튼을 놓으면,
+최종적인 선분을 저장하고, 임시 선분들은 계속 삭제됩니다. 
+
+임시 선분의 color는 회색이고, 최종 선분의 color는 옐로우와 마젠타 입니다
+이렇게 두 개의 라인 쎄그먼츠를 입력 받는 프로그램 입니다. 

@@ -1,0 +1,334 @@
+﻿In this class, we will be studying vector and geometry (geometry)
+among mathematical graphics theories
+Many of them are very basic,
+and you may already know all of them
+Even so, let's take a look again to review
+A right hand coordinate system
+is a coordinate system that we usually use in math class
+We're also using a right hand
+coordinate system in the OpenGL API that we're going to be using in this course
+In CG, we're usually doing the y axis upward
+The +z axis is the direction that comes out of the screen
+If you clench your fist completely and spread your right thumb, index finger, and middle finger
+perpendicular to each other, in that order,
+it points to the x, y, and z axes of the right-hand coordinate system, respectively
+In the left-handed coordinate system,
+the z-axis is pointing inward on the screen
+In CG, this left-handed coordinate system is used in the camera
+coordinate system that appears in the viewing
+transformation process
+We will study this later. The World coordinate system
+is the only coordinate system that exists
+in the CG scene we will draw
+All the objects are placed in this world
+coordinate system and shown in one scene
+A local coordinate system is primarily a coordinate system
+used to model (design) each part or object
+Even when modeling an object that is tilted like this,
+it is usually initially modeled straight around the origin
+Local coordinate systems play an important role,
+especially when animating multi-linked bodies
+connected by joints, such as the human body
+In this case, the local coordinate of the red point in the figure was (3, 1),
+but if you rotate the object around the origin and then translate it,
+the world coordinate of that point becomes (4, 5)
+Later, we will study the transformation from local
+to world coordinates
+Vector has direction and size (magnitude)
+For example, the vector from point P1 to P2 can be obtained as P2 - P1
+The vector has a direction and size,
+but there is no fixed position (position)
+Therefore, these three vectors in the figure are all the same
+On the other hand, scalar is composed of only one component,
+which has no direction (direction) and only size (magnitude)
+For example, 3 and 235.5 are scalars
+Let's say we have two vectors, V and W
+The sum and the difference between V and W are calculated like this
+The sum of two vectors
+represents a new vector, which can be drawn in these two ways
+The a - b vector is a vector that goes from the head of the b
+vector to the head of the a vector
+when the tails of a and b are matched to the same point
+Since a - b is equal to a + (-b), we can also draw it like this
+Although these two vectors a+(-b) and a-b are in different positions,
+they have the same direction and size,
+so they are exactly the same vectors
+The magnitude (size) of a vector,
+sometimes called length, size, and norm, refers to the length from tail to head,
+and is the square root of the sum of the squares of each component
+Normalization (normalization) refers to making the size 1
+while maintaining the direction of the vector
+You can normalize by dividing each component of the vector
+by its magnitude
+In particular, a vector with magnitude 1 is called a unit vector
+The dot product V.W of two vectors
+V and W is defined as follows
+The sum of the product of each component of two vectors
+Here, theta refers to the angle between the two vectors,
+and if you know the value of the dot product,
+you can find theta using the arccos function
+The result of the dot product is a scalar value,
+so the dot product is also called a scalar product,
+or an inner product
+In particular, dot product v.v
+with oneself becomes the square of the size of the vector, |v|^2
+Let's look at the process of obtaining the projection vector
+w when projecting a vector v over another vector u
+First, by the definition of cosine,
+the size of w can be expressed as the size of v times cosine theta
+Also, by the definition of dot product of u,v, the size of w is u.v
+divided by the size of u
+So if u is a unit vector,
+then the size of w will be u.v
+The direction of w is equal to u, and since its size has been determined,
+w can be obtained like this
+Now let's look at the relationship between the size of the angle
+theta and the dot product between the two vectors
+When the dot product is positive,
+cosine theta is positive,
+so the size of theta is going to be between 0 and 90 degrees
+So theta is an acute angle
+If dot product is negative, cosine
+theta is negative,
+So theta is going to be an obtuse angle that's greater than 90 degrees
+So if the dot product is exactly zero,
+that means the two vectors are perpendicular, so theta is 90 degrees
+And this relationship is going to be very useful
+in many graphics operations
+So here we have one polygon
+So how do we get the normal vector which is perpendicular to this polygon?
+We get the normal vector N as the cross product of two vectors
+V1 and V2 on top of that polygon
+Note that V1, V2, and N form a
+right-handed coordinate system
+If we calculate V2 cross V1, we will get the normal vector
+which is opposite to N in the figure
+So how do we get the cross
+product of V1 and V2? Cross product is calculated as determinant like this
+3 x 3 determinant is obtained using 2 x 2 determinant like this
+where i, j, and k are unit vectors in the x, y, and z axes, respectively
+The computational result of cross product is vector, not scalar
+So cross products are also called vector products
+or outer products
+The size of a cross product vector can be obtained by a formula like this
+When A x B = C, the size of C is (size of A) x (size of B) x sin (theta)
+Here, theta is the angle between A and B vectors
+Therefore, if A and B are unit vectors, the size of C is sin(theta)
+You can represent a vector as a column vector or as a row vector, but usually you're using more of a column vector representation
+The product, Mv, of matrix M and vector v is going to be another vector w
+Dot product A dot b can be expressed as the product of AT and b,
+where AT is a low vector expression as the transpose of A
+Line (straight line) is an infinite straight line
+There is no fixed start and end point
+Line segment (straight segment) is a case where a start and an end point are clearly given,
+and it has a finite length
+If only a start point is given and there is no end point, it is specifically called a ray
+The general implicit form of 2D line, i.e., the implicit form, is in the form of f(x,y) = ax
++ by + c = 0
+The form of two points given two points is like this
+Given two points p1 and p2,
+the two points parametric form of the line
+is represented by C(t) = (x(t), y(t))
+Here, t is a parameter and infinite line,
+so t ranges from minus infinity to infinity
+x(t) is x1 + (x2 - x1)t, and if we summarize this for x1 and x2,
+it is x1(1 -t) + x2 t,
+which is the expression of the x component of parametric line C(t)
+Similarly, y(t) is the expression of y component
+That is, C(t) can be seen as a vector
+form of x(t) and y(t)
+When t is 0, C(0) becomes (x1, y1), that is, p1
+When t is 1, C(1) becomes (x2, y2), i.e. p2
+There is a point and vector form as another form of parametric
+C(t) = p1 + vt, p1 is a point on line
+and v is a direction vector on line
+If we summarize the expression of two points
+form about t, it becomes points and vector form
+So even if you do it in a different way,
+it's going to end up showing the same line
+Implicit 2D line f
+If we calculate the partial differential of f
+about x and about y,
+we get the vector (a, b)
+This vector is a normal vector (normal vector) N, which is perpendicular to the line
+Tangent vector (tangent vector) T = (-b,
+a), which is a vector perpendicular to the normal vector,
+and is the same as the direction vector of line
+N's y component b is taken as x,
+minus is added, and a is sent as y component
+If the normal and tangent vectors are vertical,
+we can confirm that they are zero by dot product
+Parametric form C(t) represents line
+Tangent vector T(t) can be obtained by differentiating x(t) and y(t)
+with respect to t, respectively
+Since the normal vector N(t) is perpendicular to T(t),
+it is readily available as in the previous case
+In the case of a line segment
+where the start and end points are defined,
+the implicit form is not easy to use
+Two points parametric form is the most appropriate
+The parameter t of C(t) = (x(t), y(t) is clearly defined as between 0 and 1
+X(t) and y(t) can be represented in the form of an infinite line
+By substituting 0 and 1 for t,
+we can see that the starting point C(0) and the end point C(1) are obtained
+Let's look at one example
+Given two points p1 and p2,
+we want to find the implicit line passing through the two points
+We easily found the implicit line
+f(x,y) = 0 with the formula of the two point form
+Parametric line C(t) is also easily available
+from both points
+We also got tangent and normal vector from C(t)
+By the way, if we get Normal from the implicit form f(x,y),
+it's (a, b) = (2, -1), which is the opposite direction
+from the parametric form
+This is a question of geometry's direction
+So this means that given two points,
+we cannot determine which way
+is the normal direction of this line
+We need to include more information to overcome this problem,
+which we will find out more about in the future
+Consider a circle with a center at (a, b) and a radius of r
+As an implicit form,
+it can be expressed as f(x,y)
+= (x-a)^2 + (y-b)^2 − r^2 = 0
+In the Parametric form,
+c(theta) = (x(theta), y(theta)
+It can be expressed as =(a + r
+cos(theta), b + r sin(theta))
+Consider the equation of an ellipse
+whose center is at (h, k) and whose two axes have lengths a, b
+Implicit form is like this
+Parametric form is like this
+Now let's consider the intersection (intersection) of Circle and Line
+Circle was given as implicit form
+Line was given as parametric
+Substitute x(t) and y(t) into x and y of circle's implicit equation respectively
+This equation is a quadratic equation with respect to t
+Solve this quadratic equation
+If this equation has two roots, line and circle intersect
+at two points
+If we substitute two t into C(t),
+we can get two intersections
+If the equation has only one root, line is the case
+where it touches the circle at one point
+The root of the equation
+does not exist when there is no intersection of line and circle
+In the operation to find the intersection
+of two objects
+A and B, we can easily find the intersection
+by putting one side as implicit
+and the other side as parametric
+Let's look at an example to find the intersection of a circle and a line segment
+First, the line segment was given as both endpoints p1 and p2
+The equation of the parametric line
+passing through two points is L(t) = (x(t), y(t)
+and can be expressed as x(t) = at + b, y(t) = ct + d
+Here, the range of t is limited to between zero and one
+Because the line segment is only valid between both endpoints
+The equation of a circle is defined as (x-e)^2
++ (y-f)^2 = r^2 in the implicit form,
+where (e,f) is the center point of the circle and r is the radius of the circle
+Now we substitute x(t), y(t) of
+Line's equation into x, y of circle's equation, respectively
+In summary, we can find the quadratic equation At^2
++ Bt + C = 0 for t
+To get the root of the quadratic equation,
+consider the discriminant D = B^2 - 4AC
+When D > 0, there are two root t
+When D = 0, we have one root
+When D < 0, there is no real root. However,
+for two cases where there is a real root,
+we need to calculate the root t and see if it is between 0 and 1
+In this case, if the line segment spans over the circle, D > 0 and there are two roots,
+and both t are between 0 and 1
+This is the case where D > 0 and two ts are counted,
+but one root is invalid because the line segment is short
+That is, one t is not between 0 and 1
+In this case, again, D > 0
+and we can get two t, but neither of them is between 0 and 1
+Now, by substituting only valid t into line equation L(t),
+we can get a valid intersection
+This time, let's talk about line in 3D
+First, when two points
+p1 and p2 in three dimensions are given
+Parametric line C(t) is represented by component x(t), y(t), and z(t)
+X(t), y(t), and z(t) can be obtained like this,
+the same as the representation of 2D line
+By substituting 0 and 1 into t, you can see that two points
+C(0) and C(1) are obtained
+This is the point-vector form of a 3D line
+Like 2D, C(t) can be represented as p1 + vt using a point
+p1 and a direction vector v
+When representing 3D line in implicit form,
+it is impossible to use only one equation
+It should be represented by two equations as shown here
+The first one is for x and y and the second one is for y and z
+Now let's talk about plane and plane patch
+You have to distinguish between a plane and a plane patch
+Plane is infinite and has no explicit range
+A plane patch is a finite piece of plane
+A plane patch is given its range explicitly
+f(x,y) = Ax + By + Cz
++ D = 0, this is the plane equation of the Implicit form
+Where n = (A, B, C) vector is the normal vector of plane
+Let's try to derive the plane equation
+First, normal vector n = (A, B, C) was given
+Also, a point p = (x1, y1, z1) above the plane was given
+In this case, the plane is the set of all points r = (x, y, z),
+where n and (r - p) vectors are perpendicular
+Therefore, the dot product of n and (r-p) is zero
+If we solve this equation again, Ax + By + Cz + D = 0
+Here, D = - (A, B, C).(x1, y1, z1) = -n.p
+Suppose we are given a point P1 in three dimensions and a plane Ax
++ By + Cz + D = 0
+Whether P1 is on the plane,
+Let's see if it's outside the plane
+or inside the plane
+Let's calculate the value of Ax1 + By1
++ Cz1 + D by substituting the coordinate of P1 (x1, y1, z1) into the plane equation
+If its value is 0, P1 is above the plane
+If the value is negative, P1 is on the inside of the plane
+If the value is positive, P1 is on the outside of the plane
+Outside is the direction the plane normal vector is pointing
+How can I get a plane that contains all three dots,
+p1, p2, and p3?
+First, we can get two vectors (p2 - p1) and (p3 - p1) starting from p1
+And since the normal vector has to be perpendicular to both of these vectors,
+it can be obtained by the cross product of both vectors
+Here we remember that two vectors
+(p2 - p1), (p3 - p1) and normal vector represent a
+right-handed coordinate system in the x,
+y, and z directions in turn
+There's a dot on the normal vector and on the plane,
+so you can get the implicit equation of the plane
+like we just did on slide
+So let's take a look at the parametric form of the plane
+Plane r can be expressed as p + sv + tw
+where s and t are pameters that are infinite
+P is an arbitrary point on the plane
+V and w are vectors that start at p and point in different directions
+V and W do not have to be perpendicular,
+but they should not be parallel to each other
+That is, v and w should be two vectors that are linearly independent (linearly independent)
+The implicit form f(x,y,z) of a sphere
+whose center is (xc, yc, zc) and whose radius is R is (x-xc)^2
++ (y-yc)^2 + (z-zc)^2 - R^2 = 0
+Let's get the intersection of this sphere and line C(t)
+As mentioned earlier, sphere is implicit
+and line is parametric
+This is good for finding intersection
+We substituted x, y, and z of f(x,y,z) with x(t),
+y(t), and z(t) of line, respectively
+So this is going to be a quadratic equation for t
+So we have zero or one or two roots
+If you draw a picture, it looks like this
+This is very similar to the case of line-circle intersection
+Now let’s look at the Gongseven Line Sagments program.  When you click the left mouse button,
+it starts to draw a line segment, and when you move the mouse without letting go of the button,
+it continues to draw a temporary line segment that changes
+ If you release the right mouse button,
+it will save the final segment and keep deleting the temporary segment
+The color of the temporary segment is gray,
+and the color of the final segment is yellow and magenta
+This is a program that receives two line sediments
