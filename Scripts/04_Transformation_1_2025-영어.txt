@@ -1,0 +1,334 @@
+﻿Let's start the lecture on Transformation
+A Frame has a Set v of Basis
+forming an axis and an Origin P0
+We represent the frame as (v1, v2, v3, P0) = (v, P0)
+Point P is uniquely expressed using Frame as P = P0 + b^(T} v
+B = (beta1, beta2, beta3) are the coordinates of P with respect to the frame (V, P0)
+In the case of point P,
+it cannot be expressed with just the basis because it has a fixed position,
+and it can be expressed with a frame with an origin added to the basis
+Now let's look at some basic transformations used in 3D
+First is translation, parallel movement
+This refers to the case where a point P is translated by d and moved to P'
+If all the vertices that make up a 3D object are translated by d,
+the object itself will naturally be translated by d
+Let's represent the translation in matrix form
+The original point p and the position
+p' after translation are both represented as 4D vectors with homogenous coordinates
+At this time, the 4 x 4 matrix T(ax, ay, az) is defined as follows,
+where d = (ax, ay, az) is a translation factor
+If you look closely, it is a form in which the translation factors (ax,
+ay, az) are arranged in order in the rightmost column of the identity matrix
+If we multiply this Translation Matrix T by the Original Point
+p to calculate Tp, we get p'
+This fits well with the definition of Translation
+In the future, you will often see Translation
+Operation and Translation Matrix T used interchangeably
+Then, let's consider the case where d = (ax,
+ay, az) is translated and then -d = (-ax, -ay, -az) is translated again
+Point p is translated by d and goes to p' and then is translated again
+by -d and goes back to p
+Since p' equals Tp, if we multiply both sides by the inverse matrix of T⁻¹,
+we get p =T⁻¹ p'
+That is, the matrix of the inverse translation
+is the inverse matrix of the original translation matrix T
+Then, -d as much translation,
+That is, what would the matrix representing the inverse translation of the original translation be?
+This is the inverse matrix T⁻¹ of T, and if you calculate it, you get the following equation
+This is exactly the case when we create the translation matrix
+we defined when -d = (-ax, -ay, -az)
+This time, we will define rotation,
+but to simplify the explanation, let's first look at the case of 2D rotation
+Let the point (x,y) in 2D
+be (x', y') when it is rotated counterclockwise by theta
+At this time, the original x can be expressed
+as ρ cos(phi), y can be expressed as ρ sin(phi)
+Here, ρ is the distance from the origin to X and Y, which, as we all know, is √(x² + y²)
+The results x' and y' after rotation by theta
+can be expressed as ρ cos(𝜃 + ϕ) and ρ sin(𝜃 + ϕ), respectively
+Using the sin and cos formulas, x' and y' can be expressed as follows
+If we replace ρ cos(ϕ) and ρ sin(ϕ) here with x and y,
+we get the following equation
+This is the formula for finding the result (x',y') when (x, y) is rotated by 𝜃
+Finally, if we organize this equation into matrix form, it becomes like this
+Here, the 2 x 2 matrix consisting of cos and sine
+becomes the matrix of 2D rotation
+Now let's take things up a notch and define rotation in 3D
+In rotation in 2D, the rotation axis has always been (0, 0, 1), i.e. the z-axis
+However, in 3D, there are infinitely many axes of rotation possible
+First, if we define the 3D rotation about the z-axis used in 2D, it will be as follows:
+If we rotate (x, y, z) by 𝜃 about the z-axis, x'
+and y' are the same as in the 2D rotation, and z' remains the same as z
+Since the z-axis is the rotation axis, no matter what point is rotated about the z-axis,
+the z-coordinate does not change because the rotation is performed on the xy plane
+that is perpendicular to the z-axis
+Using matrix, we can express this as p' = R_z(p)
+Here, R_z(𝜃) is a 4 x 4 rotation matrix representing a rotation of 𝜃 about the z-axis
+If you look closely, the 2 x 2 portion in the upper left of R_z(𝜃) is the same as the 2D rotation
+matrix we saw in the previous slide
+The rest is in the form of a general transformation matrix
+where only the diagonal elements are 1
+So why is the rotation matrix in 3D
+expressed as a 4 x 4 matrix instead of a 3 x 3?
+That's because of the translation matrix explained earlier
+As we saw earlier, the translation
+matrix cannot be represented as a 3 x 3 matrix and must use homogeneous coordinates
+If all transformation matrices must be represented
+as one type from the perspective of data structure,
+This is why we use a 4 x 4 matrix instead of a 3 x 3
+Now let's look at rotation about the x-axis and y-axis
+First, the rotation matrix R_x(𝜃) about the x-axis is expressed as follows
+If you look closely, you will see that the 2 x 2 rotation part is concentrated in the center of the matrix
+Similarly, the rotation matrix about the y-axis is as follows
+Let's say we apply a rotation transformation R(𝜃) that rotates by θ to (x, y) to obtain (x' y')
+Now let's look at the reverse transformation R⁻¹(θ)
+which goes from (x' y') back to (x, y)
+Conceptually, R⁻¹(θ) is the same as R(-θ)
+That is, the rotation that returns to the original position after rotating by
+θ is a rotation by minus θ
+We used cosθ and sinθ values in rotations
+about the x, y, and z axes
+If we substitute -θ for θ in this equation,
+cos(-θ) is equal to cosθ and sin(-θ) is equal to -sinθ
+So, the matrix of R(-θ) can be easily obtained by slightly changing R(θ)
+In other words, R⁻¹ is the inverse matrix of R
+But if you actually calculate R⁻¹, it comes out to be the same as R^T
+Transpose of a matrix refers to the operation of swapping rows and columns of a matrix
+To summarize, when R is given, R⁻¹, R(-θ), and RT are all the same
+During transformation, rotation and translation are called
+rigid transformation or rigid body transformation
+This means that for rotation and translation,
+no matter how many times you repeat them
+and in what order, the shape or size of the object being transformed will not change
+As you can see in the picture,
+Reflection Transformation also belongs to Rigid Transformation
+Reflection is a transformation that reflects an object
+as if it were a mirror around a reference axis
+Rigid Transformation only changes the location and orientation of an object
+On the other hand, Non-Rigid Transformation can change the size of an object
+or even change the shape of the object itself,
+such as by distorting it
+Scaling is a transformation that changes the size of an object
+Uniform scaling, which changes the size of an object consistently along all axes, is possible,
+as well as non-uniform scaling,
+which changes the size in a non-uniform way along the axis
+Scaling is a type of non-rigid transformation
+Scaling can be thought of
+as changing the distance from the origin to point (x, y, z)
+The formula for changing the distance to X by βx times,
+the distance to Y by βy times, and the distance to Z by βz times is as follows:
+Here, βx, βy, and βz are called scaling factors
+For example, if βx is 0.5, the distance in the x direction will be half of the original distance
+If βx, βy, and βz are all the same value,
+it is uniform scaling, and if they are not the same, it is non-uniform scaling
+When representing a scaling transformation
+like p' = Sp, matrix S is a 4 x 4 scaling
+matrix, and βx, βy, and βz are located on the diagonal elements
+Suppose (x, y) is scaled by βx, βy, βz and sent to (x', y')
+At this time, the inverse scaling
+S⁻¹ that converts (x', y') back to (x, y) is S( 1/βx,
+1/βy, 1/βz ), that is, take the inverse of the scaling factor
+Even without a detailed explanation, you can intuitively understand why
+Shearing transformation acts to tilt and distort the original object,
+as shown in the figure
+To see this in more detail, let's look at a cross-section on the xy plane
+In the picture, we are translating the point (x, y) to (x', y')
+As the y value increases, the amount of movement increases,
+ultimately tilting the object by an angle of 𝞱, resulting in a distorted effect
+Since y = 0 is maintained at the base of the rectangle,
+we can see that the original base remains the same
+If we express this as a trigonometric function,
+tan(𝞱) can be expressed as y'/(x' - x) or y/(x' - x) by definition
+cot(𝞱) is the reciprocal of tan(𝞱), so it is (x'-x)/y
+From this, x' = x + y cot(𝞱) y ' = y and Y
+and since it moves only in the x direction, z' does not change
+If we express this as X-Shearing matrix H_x(𝞱), it is as follows
+And H_x⁻¹(𝞱), which is the inverse of H_x(𝞱), is equal to H_x(-𝞱)
+Using similar methods to this derivation process,
+Y-Shearing and Z-Shearing Transformations can also be easily derived
+I want you to try these yourself
+Let us assume that P is transformed into P' by M1
+and P' is transformed into P'' by M2
+These two equations can be combined to write P'' = M2 M1 P
+If the product of M2 and M1 is M3 matrix, then M'' can be expressed as M3 P
+At this time, M3 is called the matrix of Composite Transformation
+One thing to note is that Composite Transformation does not follow the commutative law
+That is, M2 M1 and M1 M2 do not exhibit the same transformation
+This is also a general property of matrix multiplication
+For example, in this figure, P is first rotated by 90 degrees to transform into P', and then translated by (3, 3)
+to finally become P'' = (2, 6)
+However, if you do a translation (3, 3) first and then a 90-degree rotation,
+you get a completely different result: P'' = (-4, 6)
+That is, when considering composite transformations,
+you must pay attention to the order of the transformations
+For an explanation of matrix multiplication, please see this URL
+Let's learn more about the properties of rotation matrices
+The 4 x 4 rotation matrix R in 3D is defined as follows
+We have previously considered only rotations about the basic axes x, y, and z, but in fact
+there are infinitely many vectors that can be rotation axes in 3D
+Considering these general rotation axes,
+the general form of the rotation matrix is expressed as
+In particular, rotation uses only the 3 x 3 portion of the upper left of the 4 x 4 matrix
+So let's consider this 3 x 3 part as an R-hat matrix
+R-hat has the following properties:
+First, all row vectors are perpendicular to each other
+All column vectors are also perpendicular to each other
+And if you multiply R-hat and the transpose of R-hat,
+you get the identity matrix
+As a result, we can see that
+the transpose of R-hat is equal to the inverse of R-hat
+In general, finding the inverse matrix is quite complicated,
+but it is very convenient because it can be done simply by transposing
+A matrix that satisfies the three properties above is called an Orthogonal Matrix
+Earlier R-hat had one more property here
+The property is that all Row Vectors and Column Vectors are Unit Vectors
+A matrix that satisfies all four of these properties is called an Ortho-Normal Matrix,
+and it is a correct Rotation
+Matrix that maintains the properties of Rigid Transformation
+The 4 x 4 rotation matrix R has this form
+The translation matrix T has this form
+Now, let's consider a composite transformation
+that first performs rotation and then translation
+The matrix M of this composite transformation
+is the product of T and R
+If you apply rotation to point P first, it becomes RP
+If you apply translation to RP, it becomes TRP, so M = TR
+It has already been explained before that
+the order of matrix multiplication should not be changed
+If you look closely at the calculated M, you can see that the rotation matrix is still in the 3 x 3 part on the upper left
+On the other hand, you can see that
+the translation factors remain in the far right column
+If you actually multiply this matrix by TR, you get this:
+So, we can see that
+the matrix of the Composite Transformation of Translation
+After Rotation can be easily found
+without actually calculating the product of the matrices
+As an example of a Composite Transformation,
+let's consider a rotation about an arbitrary point other than the origin
+As you can see in the picture, the gray triangle is transformed into a yellow triangle
+by rotating 90 degrees about the red point P=(x1, y1)
+All the rotations we've considered so far have been rotations about the origin
+To utilize that rotation, we first apply T1(-x1, -y1) to the triangle,
+which translates P to the origin
+Then we apply the rotation R(θ) about the origin
+Finally, we apply T2 = (x1, y1) which translates the origin back to the original P
+The composite transformation that combines all of these three stages of transformation
+is T2 R T1
+Consider two different frames (v1, v2, v3, P0) and (u1, u2, u3, Q0)
+The first frame is a frame with P0 as the origin
+and v1, v2, and v3 as the three axes, or basis vectors
+Similarly, the second frame is a frame with Q0 as the origin and u1, u2,
+and u3 as basis vectors
+Among them, if we express frame (u1, u2, u3, Q0)
+in terms of another frame
+(v1, v2, v3, P0), it can be expressed as this equation
+That is, the vectors (u1, u2, u3) can be expressed as coordinates in basis v1, v2, v3 respectively,
+and since Q0 is a point,
+it can be expressed as follows for frame (v1, v2, v3, P0)
+These equations are organized in matrix form
+That is, (u1, u2, u3, Q0) can be expressed as the product of M and (v1, v2, v3, P0)
+Here, M is a 4 x 4 matrix containing the coordinates of (u1,
+u2, u3, Q0) with respect to (v1, v2, v3, P0)
+The matrix M is called the "Matrix of change of frames"
+That is, it is a matrix that changes the first frame into the second frame
+Let's assume that the coordinates of point P in frames G and F
+are a and b, respectively
+If we recall from the first part of this
+note that we expressed the coordinates of a point in a given frame,
+P can first be expressed as b^T times F in terms of frame F
+Similarly, if we express P in terms of the G frame, it becomes a^T times G
+If there exists a transformation
+M that changes b^T to a^T, then
+b^T times M will be equal to a^T, and so it can be expressed as
+If we rewrite it, A transpose equal B transpose M
+If we transpose both sides, we get this equation:
+If we solve this, we get a = M^T b
+For reference, the transpose (XY)^T of the product XY of two matrices is Y^T times X^T
+Here, M^T can be seen as a transformation
+matrix that converts coordinates from Frame F to G
+Here, to convert the coordinates in the opposite direction, i.e
+from Frame G to F, we can apply the inverse of M^T
+Here, let's denote the inverse of M transpose as matrix T
+I don't quite get the feel of it when I just try to explain it this way,
+so let's look at a real example
+First, consider two different frames G and F
+Let's call the coordinates of a point in those two frames
+a and b, respectively
+Since we said that a=Cb, C is the coordinate conversion
+matrix from b, that is, frame F, to a, that is, frame G
+In the previous slide, C was expressed as M^T
+The problem is how to find this C
+Let's assume that we can represent frame G in frame F, as shown in the figure
+As you can see in the figure, the X-axis of G is represented by the unit
+vector u of F, and the Y-axis is represented by the unit vector v in F
+And let's assume that the origin of the G frame is also point P when expressed in terms of the F frame
+Let's first consider the inverse of C
+This is the matrix that converts the coordinates of G to F
+In the previous slide, the inverse of C was denoted as T
+Since T is a matrix that converts G to F, converting the X-axis of G, i.e
+(1, 0, 0), to T yields u
+Recall that in the previous slide we assumed that
+the X-axis of G is represented by U in the F frame
+Here, the X-axis of G is represented as (1, 0, 0, 0) in a homogeneous representation,
+but in fact, the part of T that the result of the transformation of the XYZ axes of G contributes to is the 3 x 3 part on the upper left,
+which is the rotation part of the 4 x 4 matrix
+So I set the W value to 0
+Similarly, if we transform the Y-axis of G, i.e. (0, 1, 0), to T, we will get V
+Also, if we convert the Z-axis of G, i.e. (0, 0, 1), to T, we will get N
+Finally, if we convert the origin of G (0, 0, 0) to T, we get P
+Here, the origin and P are not axes but points, so w is set to 1
+Now, if we put all these results together and find the T matrix, it will look like this
+Looking at the T matrix, the u, v, n vectors are written in the 1st, 2nd, and 3rd columns respectively,
+and the coordinates of the origin P are placed in the last column
+But this form is something I've seen a lot
+This is the matrix form of Composite Transformation
+of Translation After Rotation
+That is, when the unit vectors of the three basic axes of G in the F frame are u, v, and n,
+Create a 3 x 3 rotation matrix with those three vectors in three columns
+and place it in the upper left 3 x 3 part of F
+And then you can make the coordinates of the origin of G in the F frame
+into the translation part of T
+That is, the T matrix that converts G to F is the product of the Translation
+matrix and Rotation matrix created as above
+In summary, if any frame G can be expressed in terms of a reference frame F, then
+it is easy to create a matrix T that converts
+core deines of G into core deines of F, as in E
+So, how do we find the opposite case,
+that is, the matrix C that converts F to G?
+C can be found by calculating the inverse of T
+But, we said that T is in the form of a product of a translation matrix and a rotation matrix
+Here, let's represent the translation matrix as H and the rotation matrix as K
+Then, C, which is the inverse of T, becomes the product of the inverse of K
+and the inverse of H
+As mentioned above, the Rotation
+Matrix is ortho-normal and its inverse is equal to the transpose,
+so the inverse of K can be simply obtained by transposing K
+Also, the inverse of the Translation Matrix
+H represents the translation in the opposite direction of the Translation Factors
+P1, P2, and P3, so it can also be easily obtained
+That is, to find C, it is much simpler to inverse
+H and K separately before calculating T by multiplying H and K
+Now that we know how to find the Change OF Frame Matrix in both directions,
+let's try solving a real problem
+To simplify the calculations, let's explain it as a two-dimensional problem
+First, the unitvector U representing the X-axis of G in the F frame is 2/root 5, 1/root 5. 1
+Also, the unitvector v representing the Y-axis of G in the F frame
+is root root 5 minus 1, root 5/2
+In fact, if you calculate these numbers by marking them on the 2D grid in the picture,
+you can see that they are correct values
+Also, if we represent the origin of G in Fframe, we get P = 3, 2
+Now we want to find the matrix T that transforms G to F
+As seen in the previous slide,
+T is the product of the Translation
+Matrix created using P and the Rotation Matrix created using UV
+That is, T is expressed in this way
+Now, in the opposite direction, Matrix C,
+which transforms F to G, is simply the inverse of T
+By using T = T_P R, I think we can easily find the inverse (T_P R)⁻¹ = R⁻¹ T⁻¹_P
+If we express this as a formula, it is as follows
+Finally, if we multiply the two inverse matrices, we can find the Cmatrix
+Now, to convert the point Q= (4, 5) expressed in terms of the F frame
+into coordinates in terms of the G frame,
+we just need to compute the product of C and Q
+I found (2.236, 2.236). Based on the G frame in the picture,
+it seems to be roughly correct

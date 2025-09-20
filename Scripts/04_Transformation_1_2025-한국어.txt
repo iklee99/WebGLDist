@@ -1,0 +1,334 @@
+﻿Transformation 에 대한 강의 시작하겠습니다
+Frame은 축을 이루는 Basis의 Set v와
+Origin P0를 가지고 있습니다
+우리는 Frame을 (v1, v2, v3, P0) = (v, P0) 로 표현합니다
+Point P 는 Frame을 사용하여 P = P0 + b^(T} v 로 유일하게 표현됩니다
+B = (beta1, beta2, beta3)는 frame (V, P0) 에 관한 P의 coordinates 입니다
+point P의 경우는 고정된 position 이 있기 때문에 
+basis 만으로는 표현이 불가능하며
+basis에 origin 이 추가된 frame 으로 표현이 가능합니다
+이제 3차원에서 사용되는 몇 가지 기본적인 transformation 에 대해 알아보겠습니다
+먼저 translation, 평행이동 입니다
+한 점 P 를 d 만큼 translation 해서 P' 으로 이동시키는 경우를 말합니다
+하나의 3D object 를 이루고 있는 모든 vertex 들을 d 만큼 translation 시키면
+자연히 object 자체가 d 만큼 translation 되게 됩니다
+translation 을 matrix 형태로 나타내 보겠습니다
+원래의 점 p 와 translation 된 후의 포지션 p' 을
+모두 homogenous coordinates인 4D vector들로 나타내었습니다
+이때 4 x 4 matrix T(ax, ay, az) 를 이렇게 정의하는데
+d = (ax, ay, az) 는 translation factor입니다
+자세히 보면 identity matrix의 맨 오른쪽 column에
+translation factor들인 (ax, ay, az) 를 차례로 배치한 형태입니다
+이 Translation Matrix T 를 Original Point p 에 곱하여
+Tp 를 계산하면 p' 이 나오게 됩니다
+이것은 Translation의 정의에 잘 맞습니다
+앞으로는 Translation Operation과 Translation Matrix T가
+종종 같은 의미로 사용되는 경우들을 보게 될 것입니다
+그러면 d = (ax, ay, az) 만큼 translation 했다가
+다시 -d = (-ax, -ay, -az) 만큼 translation하는 경우를 생각해 봅니다
+point p는 d만큼 translation 되어서 p'으로 갔다가
+다시 -d 만큼 translation 되어 p로 돌아가게 됩니다
+p' equal Tp 였으므로 양변에 T의 역행열 T⁻¹ 를 곱해주면
+p =T⁻¹  p' 이 됩니다
+즉, inverse translation의 matrix는
+original translation matrix T의 역행열이 되는 것입니다
+그러면, -d 만큼의 translation,
+즉, 원래 translation의 inverse translation을 나타내는 matrix는 어떻게 될까요?
+이것은 T의 역행렬 T⁻¹와 같은데 이를 구해보면 식과 같이 나옵니다
+이는 -d = (-ax, -ay, -az) 일 때  우리가 정의했던
+translation matrix를 만드는 방법으로 만들어진 경우와 정확히 일치합니다
+이번에는 rotation 을 정의할 것인데
+설명을 간단히 하기 위해 2D rotation 의 경우를 먼저 살펴보겠습니다
+2D의 point (x,y) 를 
+theta 만큼 시계 반대 방향으로 회전시켰을 때 나오는 point를 (x', y') 이라 합시다
+이때 원래의 x는 ρ cos(phi),
+y는 ρ sin(phi) 로 나타낼 수 있습니다
+여기서 ρ는 원점에서 X, Y까지의 거리로, 우리가 잘 알고 있듯이 √(x² + y²) 입니다
+theta 만큼 회전 후의 결과 x' 과 y' 은 각각 
+ρ cos(𝜃 + ϕ), ρ sin(𝜃 + ϕ) 로 나타낼 수 있습니다
+sin, cos 공식을 사용하면 x' 과 y' 은 각각 이렇게 풀어서 나타낼 수 있습니다
+여기에서 ρ cos(ϕ)와 ρ sin(ϕ) 를 x와 y로 대체하면
+이와 같은 식이 나옵니다
+이것이 (x, y) 를  𝜃 만큼 회전하였을 때의 결과 (x' ,y') 을 구하는 식이 되겠습니다
+마지막으로 이 식을 matrix 형태로 정리하면 이와 같이 됩니다
+여기서 cos 과 sin 으로 이루어진 2 x 2 matrix는
+2D rotation의 matrix 가 됩니다
+이제 차원을 높여서 3D에서의 회전을 정의하려고 합니다
+2D에서의 회전에서 회전축은 항상 (0, 0, 1), 즉, z 축이었습니다
+그러나 3D에서는 무한히 많은 rotation 축들이 가능합니다
+먼저 2D에서 사용했던 z축에 관해 3D rotation을 정의하면 이 식과 같이 됩니다
+(x, y, z) 를 𝜃 만큼 z 축에 관해 회전시켜 보면
+x'과 y'은 2D 회전때와 같고, z'은 z와 같게 남아 있습니다
+z축이 회전축이기 때문에 z축에 관해 어떤 점을 회전시키더라도
+회전이 z축과 수직인 xy 평면상에서 이루어지기 때문에
+z 좌표는 변하지 않는 것이죠
+matrix 를 이용하면 이를 p' =  R_z(p) 로 표현할 수 있습니다
+여기서 R_z(𝜃) 는 z축에 관해 𝜃 만큼의 회전을 나타내는 4 x 4 rotation matrix 입니다
+자세히 보면 R_z(𝜃) 의 왼쪽 상단의 2 x 2 부분은
+이전 슬라이드에서 본 2D rotation matrix 와 같습니다
+나머지 부분은 대각선 원소들만이 1인
+일반적인 transformation matrix 의 형태입니다
+그렇다면 왜 3D에서 rotation matrix 는 
+3 x 3가 아닌 4 x 4 matrix 로 표현되었을까요?
+그것은 앞서 설명한 translation matrix 때문입니다
+앞서 보았듯이 translation matrix 는 3 x 3 matrix 로는 나타낼 수 없으며
+homogeneous coordinates를 사용해야 합니다
+data structure의 관점에서 모든 transformation matrix들을
+하나의 type 으로 나타내야 한다면
+이러한 이유 때문에 3 x 3가 아닌 4 x 4 matrix 를 사용하는 것입니다
+이제 x축과 y축에 관한 rotation을 보도록 하죠
+먼저 x 축에 관한 회전 matrix R_x(𝜃)는 이와 같이 표현됩니다
+자세히 보면 2 x 2의 rotation 부분이 matrix 가운데에 몰려 있게 됩니다
+유사하게 y축에 관한 회전 matrix는 이와 같습니다
+θ만큼 회전하는 rotation 변환 R(𝜃) 를 (x, y)에 적용하여 (x' y') 을 얻었다고 합시다
+이제 (x' y')  에서 다시 (x, y) 로 돌아가는
+역회전 transformation R⁻¹(θ) 에 대해 보겠습니다
+개념적으로 R⁻¹(θ) 는 R(-θ)와 같습니다
+즉 θ만큼 회전한 후 원래의 포지션으로 다시 돌아가는 회전은
+마이너스 θ만큼 회전하는 것입니다
+우리가 x, y, z 축에 관한 rotation 들에서
+cosθ 와 sinθ 값들을 사용했었습니다
+이 식에 θ 대신에 –θ를 넣어주면
+cos(-θ) 는 cosθ와 같고 sin(-θ) 는 –sinθ 와 같습니다
+그러니까 R(-θ) 의 matrix는 R(θ) 를 약간 바꾸어 쉽게 구할 수 있습니다
+다른 의미로 R⁻¹ 는 R의 역행렬입니다
+그런데 실제로 R⁻¹ 를 구해보면 R^T 와 같게 나옵니다
+matrix 의 transpose는 matrix 의 행과 열을 서로 바꾸는 operation 을 말합니다
+정리해보면 R이 주어졌을 때 R⁻¹ 와 R(-θ) 그리고 RT 는 모두 같게 됩니다
+Transformation 중에 rotation 과 translation 은
+rigid transformation 또는 rigid body transformation 이라 부릅니다
+그 의미는 rotation과 translation의 경우
+어떤 순서로 얼마나 반복하는지에 상관없이
+transform 하는 object 의 모양이나 사이즈를 바꾸지 않기 때문입니다
+그림에서 보면 Reflection Transformation도
+Rigid Transformation에 속합니다
+Reflection은 어떤 기준 축을 중심으로
+object를 거울에 비추듯 반영하는 transformation입니다
+Rigid Transformation은
+다만 object의 location 과 orientation 을 바꿀 뿐입니다. 
+반면에 Non-Rigidd Transformation의 경우 물체의 크기를 바꿀 수도 있고,
+찌그러뜨린다든지 해서 물체의 모양 자체를 바꿀 수도 있습니다
+Scaling 은 물체의 크기를 변화시키는 transformation 입니다
+물체의 크기를 모든 축에 따라 일정하게 바꾸는 uniform scaling 도 가능하고,
+축 방향에 따라서 통일되지 않은 크기로 변화시키는
+Non-Uniform Scaling도 가능합니다
+Scaling 은 Non-rigid transformation의 한 종류입니다
+Scaling 은 원점으로부터 point (x, y, z) 까지의
+거리를 바꾸는 것으로 생각할 수 있습니다
+X까지의 거리를 βx 배 만큼, Y까지의 거리는 βy배 만큼,
+Z까지의 거리를 βz배 만큼 바꾸는 식은 이와 같습니다
+여기서 βx, βy, βz 를 스케일링 팩터라 부릅니다
+예를 들면 βx 를 0.5로 하면 x 방향의 거리는 원래 거리의 반이 될 것입니다
+만일 βx, βy, βz 가 모두 같은 값이면 uniform scaling 이 되고
+같지 않으면 Non-uniform scaling 이 됩니다
+이처럼 p' = Sp 와 같이 scaling transformation 을 나타낼 때
+matrix S는 4 x 4의 scaling matrix 이며
+대각선 원소들에  βx, βy, βz 가 위치합니다
+(x, y) 를  βx, βy, βz 만큼 스케일링해서 (x', y') 으로 보냈다고 가정합니다
+이때 (x', y') 을 다시 (x, y)로 되돌리는
+inverse scaling S⁻¹ 는 S( 1/βx, 1/βy, 1/βz ) 
+즉, scaling factor의 역수를 취해주면 됩니다
+자세한 설명이 없이도 왜 그런지는 직관적으로 잘 이해할 수 있습니다
+Shearing transformation은 그림과 같이
+원래의 object를 기울여 찌그러뜨리는 역할을 합니다
+이를 자세히 보기 위해 xy 평면 상의 단면을 살펴보겠습니다
+그림에서 점 (x, y) 를 (x', y') 으로 translate하고 있습니다
+y 값이 커질수록 이동하는 양이 늘어나고,
+결국 물체를 𝞱의 각도만큼 기울여 찌그러뜨리는 효과를 보이고 있습니다
+사각형의 밑변에서는 y = 0 가 유지되기 때문에
+원래 밑변이 그대로 유지되고 있는 것을 볼 수 있습니다
+이를 삼각함수로 나타내면 tan(𝞱) 는 정의에 의해 y'/(x' - x)
+또는 y/(x' - x) 로 나타낼 수 있습니다
+cot(𝞱)는 tan(𝞱)의 역수이므로 (x'-x)/y 입니다
+이로부터  x' = x + y cot(𝞱)     y ' = y 이고 Y이고
+x 방향으로만 움직이므로 z'은 변하지 않습니다
+이를 X-Shearing matrix H_x(𝞱) 로 나타내면 이 식과 같습니다
+그리고 H_x(𝞱) 의 inverse인 H_x⁻¹(𝞱) 는 H_x(-𝞱) 와 같습니다
+이러한 유도 과정과 비슷한 방법들로 Y-Shearing과 Z-Shearing Transformation도
+쉽게 유도할 수 있을 것입니다
+이것들은 여러분들이 직접 해보시기 바랍니다
+P가 M1에 의해 P'으로 transform 되고
+P'은 M2에 의해 P''으로 변환된다고 가정합시다
+이 두 식을 합쳐 P'' = M2 M1 P 로 쓸 수 있습니다
+M2 M1의 곱을 M3 matrix 라 하면 M''은 M3 P로 나타낼 수 있습니다
+이때 M3를 Composite Transformation의 matrix 라고 합니다
+주의할 점은 Composite Transformation이 교환 법칙을 따르지 않는다는 것입니다
+즉, M2 M1과 M1 M2는 같은 transformation을 나타내지 않습니다
+이것은 matrix 곱의 일반적인 성질이기도 합니다
+예를 들어 이 그림에서 P는 먼저 90도만큼 rotate 되어 P'로 transform 되었고
+다시 (3, 3) 만큼 translate 되어 최종적으로 P'' = (2, 6) 이 되었습니다
+그러나 translation (3, 3) 을 먼저 한 후 90도 rotation을 하면
+전혀 다른 결과인 P'' = (-4, 6) 이 나오게 됩니다
+즉, composite transformation 을 고려할 때에는
+transformation 들의 순서에 유의해야 합니다
+matrix 의 곱에 대한 설명은 이 URL을 보시기 바랍니다
+rotation matrix 의 성질에 대해 좀 더 알아보도록 하겠습니다
+3D에서의 4 x 4 rotation matrix R이 이와 같이 정의됩니다
+우리는 앞에서 기본 축들인 x, y, z 축에 관한 회전만을 고려하였지만
+사실 3D에서 회전축이 될 수 있는 vector 는 무한히 많습니다
+이러한 일반적인 회전축을 고려하면 rotation matrix 의 일반형은
+이 식과 같이 표현됩니다
+특히 rotation 은 4 x 4 matrix 중 좌측 상단의 3 x 3 부분만을 사용합니다
+그래서 이 3 x 3 부분만을 R-hat matrix 로 분리해서 생각해 봅시다
+R-hat는 다음과 같은 성질을 가지고 있습니다
+먼저 모든 row vector 들이 서로 간에 수직입니다
+모든 column vector 들도 마찬가지로 서로 간의 수직입니다
+그리고 R-hat와 R-hat의 transpose를 곱하면
+identity matrix가 나옵니다
+결과적으로 R-hat의 transpose가
+R-hat의 inverse와 같다는 것을 알 수 있습니다
+일반적으로 inverse matrix를 구하는 것은 상당히 복잡한데
+이를 간단히 transpose로 해낼 수 있으니 매우 편리한 성질입니다
+여기까지 세 가지의 성질을 만족하는 matrix를 Orthogonal Matrix라 합니다
+아까 R-hat는 여기에 한 가지 성질을 더 가지고 있습니다
+그 성질은 모든 Row Vector와 Column Vector들이 Unit Vector라는 것입니다
+이러한 네 가지의 성질을 모두 만족하는 matrix를
+Ortho-Normal Matrix라 부르며
+Rigid Transformation의 성질을 유지하는 올바른 Rotation Matrix가 됩니다
+4 x 4 rotation matrix R은 이런 형태입니다
+Translation matrix T는 이런 형태입니다
+이제 rotation을 먼저 하고 translation을 하는
+composit transformation 을 고려해 봅니다
+이 composit transformation 의 matrix M은
+T와 R의 곱입니다
+point P에 rotation을 먼저 적용하면 RP
+RP에 translation을 적용하면 TRP가 되므로
+M = TR이 되는 것입니다
+matrix 의 곱의 순서가 바뀌면 안 된다는 것을 이미 이전에 설명하였습니다
+계산된 M을 자세히 보면 좌측 상단 3 x 3 부분에 rotation matrix 가 그대로 있고
+반면에 맨 오른쪽 column 에는 
+translation factor 들이 그대로 있음을 볼 수 있습니다
+실제로 이 matrix의 곱셈 TR을 해보면 이렇게 나옵니다
+그러니까 Translation After Rotation의 
+Composite Transformation의 matrix는
+matrix들의 곱을 실제로 계산하지 않고도
+쉽게 찾아낼 수 있음을 알 수 있습니다
+Composite Transformation의 한 예로
+원점이 아닌 임의의 점에 관한 rotation을 고려해 보겠습니다
+그림에서 보면 회색 삼각형이 빨간 점 P=(x1, y1) 에 관하여 90도 회전하여
+노랑색 삼각형으로 transform 되었습니다
+지금까지 고려해왔던 rotation은 모두 원점에 관한 rotation이었습니다
+그 rotation을 이용하기 위해 우리는
+먼저 P가 원점으로 translation 되는 T1(-x1, -y1) 을 삼각형에 적용합니다
+그리고 나서 원점에 관한 rotation R(θ)를 적용합니다
+마지막으로 원점을 원래의 P로 다시 translation하는 T2 = (x1, y1) 을 적용합니다
+이 세 단계의 transformation들을 모두 합친 composit transformation은
+T2 R T1 입니다 
+두 개의 서로 다른 frame (v1, v2, v3, P0) 와 (u1, u2, u3, Q0) 를 고려해봅시다
+첫 번째 frame은 P0를 원점으로 하고 v1, v2, v3를 세 개의 축,
+즉 basis vector 로 하는 frame입니다
+마찬가지로 두 번째 frame은 Q0을 원점으로 하고
+u1, u2, u3를 basis vector 로 하는 frame입니다
+그 중 frame (u1, u2, u3, Q0) 를
+다른 frame  (v1, v2, v3, P0) 에 관해 표현해 보면
+이 식과 같이 나타낼 수 있습니다
+즉, (u1, u2, u3) vector 를 각각
+basis v1, v2, v3 에서의 coordinates 들로 나타낼 수 있고
+Q0은 point 이므로 frame  (v1, v2, v3, P0) 에 관해 이렇게 나타낼 수 있습니다
+이 식들을 matrix 형태로 정리하였습니다
+즉 (u1, u2, u3, Q0) 은 M과 (v1, v2, v3, P0) 의 곱으로 나타낼 수 있습니다
+여기서 M은 4 x 4 matrix로  (u1, u2, u3, Q0) 의
+(v1, v2, v3, P0) 에 관한 coordinates 들을 담고 있습니다
+matrix M을 "Matrix of change of frames" 라 부릅니다
+즉 첫 번째 frame을 두 번째 frame으로 바꿔 주는 matrix입니다
+point P를 각각 frame G와 F에서 나타낸 coordinates를
+각각 a와 b라고 가정합시다
+이 노트의 첫 부분에서
+주어진 frame에서의 point의 coordinates를 나타낸 것을 기억해보면
+P는 먼저 F frame에 관해 b^T 곱하기 F로 표시할 수 있습니다
+마찬가지로 P를 G frame에 관해 나타내면 a^T 곱하기 G가 됩니다
+만약 b^T 를 a^T 로 바꾸는 transformation M이 존재한다면
+b^T 곱하기 M은 a^T 와 같을 것이고
+따라서 이렇게 표시할 수 있습니다
+다시 써보면 A transpose equal B transpose M입니다
+양변에 transpose를 취하면 이 식과 같이 됩니다
+이를 풀면 a =  M^T b와 같이 됩니다
+참고로 두 matrix의 곱 XY 의 transpose (XY)^T 는 Y^T 곱하기 X^T 입니다
+여기서 M^T 는 Frame F에서 G로 coordinates를 conversion하는
+transformation matrix라 볼 수 있습니다
+여기서 반대 방향 즉 Frame G에서 F로의 coordinates를 conversion하려면
+M^T 의 inverse를 적용하면 됩니다
+여기서 M transpose의 inverse를 matrix T로 표시하기로 합시다
+이렇게 식으로만 풀어보니 잘 감이 안 잡히는데요
+실제 예를 들어보도록 합시다
+먼저 두 개의 서로 다른 frame들 G와 F를 고려합니다
+그 두 frame에서 어떤 point의 coordinates를 각각 a와 b라고 하겠습니다 
+a=Cb 로 놓을 수 있다고 했기 때문에
+C는 b에서, 즉 frame F에서, a로, 즉 frame G로 가는
+coordinates conversion matrix입니다
+앞에 슬라이드에서는 C를 M^T로 표시하였었죠
+문제는 이 C를 어떻게 찾느냐 하는 것입니다
+그림에서 보듯 우리가 frame G를 frame F에서 나타낼 수 있다고 가정해 봅시다
+그림에서 보면 G의 X축은 F의 unit vector u,
+Y축은 F에서 unit vector v로 나타내어 졌습니다
+그리고 G frame의 원점도 F frame에 관해 나타내면 P점이 된다고 가정합시다
+이때 C의 inverse를 먼저 고려해 봅시다
+이것은 G의 coordinates를 F로 conversion하는 matrix입니다
+앞장의 슬라이드에서 C의 inverse를 T로 표시했었습니다
+T가 G를 F로 conversion하는 matrix이기 때문에
+G의 X축 즉 (1, 0, 0)을 T로 변환하면 u가 나옵니다
+앞 슬라이드에서의 G의 X축이 F frame에서
+U로 표현된다고 가정했었음을 상기하도록 합니다
+여기서는 homogeneous 표현으로 G의 X축을 (1, 0, 0, 0) 으로 표시했는데
+사실 G의 XYZ축의 변환 결과가 기여하는 T의 부분은
+4 x 4 matrix 중 rotation part인 좌측 상단의 3 x 3 부분입니다
+따라서 W 값을 0으로 놓았습니다
+마찬가지로 G의 Y축, 즉 (0, 1, 0) 을 T로 변환하면 V가 나오게 될 것입니다
+또 G의 Z축, 즉 (0, 0, 1) 을 T로 변환하면 N이 나올 겁니다
+마지막으로 G의 원점인 (0, 0, 0) 을 T로 변환하면 P가 나옵니다
+여기서 원점과 P는 모두 축이 아니고 점들이므로 w는 1로 해줍니다
+이제 이 결과들을 다 모아서 T matrix를 구하면 이와 같이 됩니다
+T matrix를 보면 u, v, n vector들을 각각 1, 2, 3번째 column에 써주고
+원점 P의 좌표를 마지막 column에 배치합니다
+그런데 이 형태는 많이 보던 것입니다
+바로 Translation After Rotation의
+Composite Transformation의 matrix의 형태입니다
+즉, F frame에서의 G의 세 기본축들의 unit vector들이 u, v, n일 때
+그 세 개의 vector들을 세 column으로 가지는 3 x 3 rotation matrix를 만들어
+F의 좌상단 3 x 3 part에 배치합니다
+그리고 F frame에서의 G의 원점의 좌표를
+T의 translation part로 만들면 됩니다
+즉, G를 F로 conversion하는 T matrix는
+위와 같이 만든 Translation matrix와 Rotation matrix의 곱이 됩니다
+요약하면 어떤 frame G가 레퍼런스 frame F에 관해 표현될 수 있다면
+G의 코어 디네이츠들을 F의 코어 디네이츠들로 conversion하는 T matrix를
+E와 같이 쉽게 만들 수 있다는 것입니다
+그렇다면 그 반대의 경우, 즉, F를 G로 conversion하는 matrix C는
+어떻게 구할까요?
+C는 T의 inverse를 계산하면 구할 수 있을 것입니다
+그런데 T가 translation matrix와 rotation matrix의 곱의 형태라고 했습니다
+여기서 그 translation matrix를 H, rotation matrix를 K로 나타내 봅시다
+그러면 T의
+inverse인 C는 K의 inverse와 H의 inverse의 곱이 됩니다
+앞에서 Rotation Matrix는 ortho-normal이고
+그 inverse는 transpose와 같다고 했으니
+K의 inverse는 일단 간단히 K를 transpose하여 구할 수 있습니다
+또 Translation Matrix H의 inverse는
+Translation Factor P1, P2, P3의 반대 방향으로 가는 Translation을 나타내므로
+또한 쉽게 구할 수 있습니다
+즉, C를 구하기 위해서는 H, K를 곱하여 T를 계산하기 전에
+H와 K를 따로 분리한 채로 inverse 하는 것이 훨씬 간단하다는 것입니다
+이제 양쪽 방향으로의 Change OF Frame Matrix를 구하는 방법을 알았으니
+실제 문제를 풀어보도록 하겠습니다
+계산을 간단히 하기 위해 2차원 문제로 설명하겠습니다
+먼저 G의 X축을 F frame에서 나타낸 unitvector U는 2/루트5, 1/루트5 입니다.  1입니다
+또 G의 Y축을 Fframe에서 나타낸 unitvector v는 루트
+루트 5분의 마이너스 1, 루트 5분의 2입니다
+사실 이 숫자들은 그림의 2D 그리드에 눈금을 세워서 계산해보면
+맞는 값들임을 알 수 있습니다
+또 G의 원점을 Fframe에서 나타내면 P= 3, 2가 됩니다
+이제 G를 F로 변환하는 matrix T를 구하려 합니다
+앞 슬라이드에서 보았듯이
+T는 P를 이용해 만든 Translation Matrix와 UV를 이용해 만든
+Rotation Matrix의 곱입니다
+즉 T는 이와 같은 식으로 표현됩니다
+이제 반대 방향, 즉 F를 G로 변환하는 Matrix C는
+T의 inverse를 구하면 됩니다
+T = T_P R임을 활용하여 inverse를 좀 쉽게 구할 수 있을 것 같습니다
+(T_P R)⁻¹ =  R⁻¹ T⁻¹_P 입니다 이를 식으로 나타내면 이와 같습니다
+마지막으로 두 inverse matrix를 곱하면 Cmatrix를 구할 수 있습니다
+이제 F frame에 관해 표현된 point Q= (4, 5) 를
+G frame에 관한 coordinates 로 변환하려면
+C와 Q의 곱을 계산하면 됩니다
+구해보니 (2.236, 2.236) 이 나오는데요
+그림에서 G frame을 기준으로 보니 대충 맞는 것 같습니다

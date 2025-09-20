@@ -1,0 +1,30 @@
+﻿One of the most efficient and reliable ways to compute rotation in 3D
+is to use Quaternions
+Quaternion is a 4-dimensional vector (q0, q1, q2, q3)
+that can be viewed as consisting of one scalar q0 and one 3D vector
+q = (q1, q2, q3)
+The theory of Quaternion is quite complex,
+but in our course, we will
+introduce only the minimum that can be used to calculate rotation
+First, two quaternions, a = (q0, q) and b = (p0, p) are given
+The sum of the two quaternions, a + b, is the sum of normal 4D vectors,
+but we improve it by adding the corresponding elements
+The product ab of two quaternions is calculated as given here
+Here, the dot product and cross product of 3D vectors
+q and p contained by a and b are used
+The magnitude of a quaternion, size, is the magnitude of a normal 4D vector
+The inverse of the multiplication of quaternions, i.e., a^{-1}, is defined as follows
+The product of a and a^{-1} is the identity for multiplication (1, 0) = (1, (0, 0, 0))
+You can use quaternions to rotate a 3D point about any axis
+First, create a quaternion p = (0, u) with a 3D point
+u = (x, y, z) to be rotated
+The rotation axis is given by the unit vector v
+Now, how to find u', which is the result of rotating u by theta about the v-axis,
+That is, let's look at u' = R_v (theta) u
+First, create the unit quaternion r
+And r^{-1} is defined as follows
+r^{-1} is also a unit quaternion
+Then, p' = (0, u') is obtained by the following equation: p' = r p r^{-1}
+There is a conversion between quaternion and rotation matrix forms
+When the quaternion r representing the rotation is given as follows, the corresponding rotation
+matrix is given as follows
