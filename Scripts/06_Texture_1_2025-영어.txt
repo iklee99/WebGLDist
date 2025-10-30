@@ -1,0 +1,325 @@
+﻿
+Let's try to express realism step by step when drawing CG scenes
+The first picture is not very realistic
+as it only uses the geometry of the objects that appear
+The following uses Phong shading, but it still feels a bit lacking
+The last one uses shading and texture maps together,
+which looks much more realistic
+Texture mapping adds realistic details to CG scenes
+It is a rendering that wraps an object in a detailed 2D image
+If all these details were to be implemented through modeling alone,
+it would be very difficult and complex
+as it would require a lot of vertices and faces
+Texture mapping provides a much more efficient method
+Texture mapping was published in 1974 in the doctoral thesis of Edwin Catmull,
+who graduated from the University of Utah in the United States
+He is the co-founder of the famous animation studio Pixar
+and serves as CEO of Walt Disney Animation Studios
+He received the ACM Turing Award in 2019
+In addition to texture mapping, he is a pioneer
+who invented many important technologies essential to current CG,
+such as bicubic surface, spatial anti-aliasing, subdivision surface, and Z-buffering
+Texture mapping technology was further developed by Catmull's successors,
+Blinn and Newell
+Let me first explain the term texture coordinates
+These coordinates are used to specify the position on the texture image
+It is usually denoted as UV or st
+Also, the horizontal, vertical, and axes are all set to have values between 0 and 1
+Let's find out what texture coordinates do
+Here is a texture image of an electronic circuit board
+This texture image has texture coordinates specified
+Let's assume we have a simple mesh shape that will be the source for texture mapping
+The shape of this mesh is not rectangular but slightly distorted
+Now, let's give texture coordinates to the four vertices
+so that the texture image can be mapped to the mesh
+First, in the first method, we gave texture coordinates (0,0),
+(1,0), (1,1), (0,1) to four vertices
+This will map the entire area of the texture image to the mesh
+Because the mesh is distorted, the image is also distorted
+and looks a bit different from the original texture
+In the second method, I changed
+the texture coordinates a bit to use only a part of the texture image
+That is, instead of (1,0) and (1,1), we gave (0.9, 0.4) and (1, 0.7)
+You can see that the distortion is prevented even though the entire texture image is not mapped
+Texture coordinates can be used to specify which
+part of a texture image should be mapped to
+an object, like this:
+This is an example of facial texture mapping
+The left side is a texture map image
+The right side shows a mesh of a human face with this texture mapping
+If you look here, you can see that we are creating a mesh in the shape of a human face
+First, we are going to do a lot of editing like this
+by pulling or pushing the vertices and rotating the view in 3D
+In fact, in software like Blender,
+you can see that the texture coordinates corresponding to each vertex are mapped
+like this and displayed on a plane like this
+And now, the texture coordinates from 0 to 1 here
+become the texture coordinates of the corresponding vertices
+So now, after mapping like this,
+there will be small pixels all over here
+Determining the color of those pixels
+involves going to the corresponding image,
+averaging it in some way, or using various techniques that will come out later
+Using those techniques, you determine the color of the image
+and then colorize that color on this pixel, that is, the fragment
+This is how texture mapping occurs
+And we need to consider something called texture wrapping
+If we have texture coordinates for a mesh, then from (0,0) to (1,1),
+the texture coordinates of S,T are from 0 to 1, 0 to 1 in the square
+image, and other texture coordinates,
+So what happens when you give texture coordinates
+that are less than 0 or greater than 1?
+So, when coordinates outside this range are assigned to mesh vertices,
+how should they be mapped?
+The default behavior that occurs in this case is gl.REPEAT
+If you look here, let's assume that this large square is now a mesh
+Let's assume that the texture image we're mapping here is the original texture,
+which is the square image in red in the middle
+So, the texture coordinates of this mesh
+are now blunt,
+but now they are given to the vertices as (-1,2), (2,2), (-1,-1), (2,-1)
+That is, the X range of the textual coordinate
+is from -1 to 2
+The Y range is also given as -1 to 2. It goes beyond 0 to 1, 0 to 1
+If we do this, it will now be divided into three parts
+So here, in the S direction, it's 0, right? This side would be 1 in the S direction
+And here, in the T direction, it's 0, and here, in the T direction, it's 1
+This is going to be 0 to 1, 0 to 1, which fits perfectly into this image
+Then, the behavior of how the remaining parts are filled with
+which texture is called texture
+wrapping behavior, and gl.REPEAT simply repeats them
+So, we can shift the texture image like this and paste it like this,
+and paste it in the same way upwards and downwards
+This option is called the gl.REPEAT option
+Likewise, there is an option called gl.MIRRORED_REPEAT
+gl.MIRRORED_REPEAT means that if this image progresses from 0 to 1,
+Here, mirroring is done, so the left and right are swapped
+In the S direction, the left and right are swapped, so the mapping is like this now, right?
+This side is the same, right? This side also
+mirrors left and right, and what about up and down? It maps like this, up and down, right?
+So, this option, which maps while reversing left,
+right, up, and down, is called gl.MIRRORED_REPEAT
+The gl.CLAMP_TO_EDGE option simply repeats the color of the pixel
+at the end of the image at the edge
+Right, here, because there was a dark pixel in this texture image,
+it is repeated until the end
+So, it is displayed in this band shape
+This is commonly called gl.CLAMP_TO_EDGE
+Next, there is an option called gl.CLAMP_TO_BORDER
+This allows us to arbitrarily specify a color for the border
+Since the color is repeated until the end, all areas that are the same,
+such as those that go from 0 to 1
+or from 0 to 1, are filled with the same color
+This is called gl.CLAMP_TO_BORDER
+So there are four texture wrapping options like this
+How do we specify texture wrapping? We said there are S and T directions
+So if we need to give a border color,
+this is the case where we give the border color
+corresponding to the Clamped Border right in front,
+and this border color is given as an RGBA value, in this case, black
+gl.texParameterfv(gl.TEXTURE_2D, Texture 2D
+is also called 3D texture
+We will not cover it here, so 2D is just done with an image
+So, the general texture mapping that we know uses texture 2D, so
+as far as texture 2D is concerned,
+the command is to make the texture border color from now on
+the border color, this given border color
+Next is the same texParameter, but this one has i attached to it
+It's not fv, but fv means floating point vector and i means integer
+So, in the same way, texture
+2D texture wrap S, that is, wrapping in the S direction,
+In other words, in cases where the range is outside of 0 to 1, the wrapping option is gl.REPEAT
+Actually, gl.REPEAT is the default, so you don't have to do this
+So we can do that, and then GL.Texture2D, GL.TextureWrapT,
+and this time in the T direction, gl.CLAMP_TO_BORDER,
+so we have this border color
+right above the clamp to border all the way to the end, right?
+This means that we can make the wrapping in the S direction
+different by making a border in the T direction and repeating in the S direction
+The difference in the size and number of the texture map image
+and the screen pixels fundamentally causes an aliasing problem in texture mapping
+In this figure, a checkered texture
+map image is mapped onto a perspective-projected trapezoid
+The points corresponding to the texture and polygon are marked in the figure
+The trapezoid is rasterized, and the colors of the texture corresponding to each pixel are extracted and mapped
+as shown on the far right
+But it is clear that this result is by no means a good one
+To prevent this, anti-aliasing techniques must be used
+This figure shows a case where aliasing occurs on the left
+and the texture is broken, and on the right is an improved result of texture mapping using anti-aliasing
+There is a simple filtering method
+that determines the color by averaging the colors of the surrounding texels
+There is also an oversampling method that divides the texels of the texture into smaller pieces
+Let's learn more about filtering methods
+There are cases where the texture needs to be enlarged or reduced
+because the sizes of the pixels representing the texture and the polygon do not match exactly
+For example, when one pixel
+P of a polygon is mapped to a quadrilateral
+made up of multiple texels in a texture,
+the texture image must be reduced or minimised
+Conversely, if multiple pixels of a polygon
+are mapped to a single texel of a texture,
+the texture image must be enlarged, that is, magnified
+In most cases, the pixels of the polygon on which the texture is to be applied
+do not exactly match the texels of the texture image
+At this time, the process of calculating the color
+to be painted on the polygon pixel from the texture image is called texture filtering
+Nearest Filter is the default filtering method of OpenGL
+When using Nearest filtering, if a red polygon pixel spans multiple texture texels
+as shown in the figure,
+the texel color of the texture to which the center of the pixel belongs is used as is
+There is no additional processing, such as averaging the surrounding colors
+This method helps to reduce texture mapping time,
+but the quality of texture mapping across the entire polygon is likely to be poor
+Because there is a possibility that the colors of neighboring polygon pixels may change abruptly,
+there is no need to specify a separate filtering method since it is the default method
+In this way, you can specify the value of gl.TEXTURE_MIN_FILTER or gl.TEXTURE_MAG_FILTER
+in gl.texParameteri as gl.NEAREST
+The method to be introduced this time is called Linear Filter or Bilinear Filter,
+which interpolates the average of the texel colors around the texel that includes the center of the specified texture
+corenate, that is, the polygon pixel
+As you can see in the picture, the pixel of the red polygon spans multiple texels,
+and the color determined is an interpolated color that appropriately averages them
+To put it simply, the closer the distance from the polygon pixel center to the texel center under consideration,
+the more the proportion of the color of that texel is increased
+To do texture filtering using this method,
+you must specify the GL_TEXTURE_MIN filter or GL_TEXTURE_MAG filter in GL_LINEAR mode
+I compared the texture mapping results when using the NEAREST filter
+and the LINEAR filter respectively
+In the case of the NEAREST filter on the left,
+the color of the mapped texture texel changes greatly for each screen pixel,
+so the result is so bad that the boundaries of neighboring pixels can be recognized
+However, the colors of each pixel appear very clearly. In the case of the Linear Filter on the right,
+the color of the pixel is determined by interpolating the colors of neighboring texels,
+so you can see that the colors of neighboring pixels change flexibly
+However, overall, the result after texture mapping shows a phenomenon
+in which the boundaries of objects appearing in the image are not distinct
+These points can be seen as a trade-off between the two methods
+Mipmap refers to preparing texture
+images of different sizes in advance before rendering
+OpenGL has a command that creates
+and prepares a MipMap after the user loads a texture image
+This allows you to select and use an appropriate texture image
+based on the size of the texture image it occupies in screen pixels
+That is, we want to keep the size of the screen pixel
+and the size of the texture texel as similar as possible
+Using or not using the MipMap method
+has a significant impact on the quality of the final texture mapping
+The left side of the figure shows the case where MipMap is not applied,
+and the right side shows the case where it is applied
+Here is another comparison result when MipMap is not applied and when it is applied
+The left picture is without MipMap and the right picture is with MipMap
+Without MipMap, the difference in texture color
+mapped between neighboring screen pixels can be severe,
+which can cause flickering
+So, let's take a look at how to generate a MipMap
+WebGL has a function that automatically creates a MipMap
+using a loaded texture image
+So the function used there is gl.generateMidmap
+Here, we can use GL texture 2D as the parameter target
+Because we are still doing 2D image texture mapping
+So we create a mipmap chain of the texture object
+image currently bound to the target
+Let's take a look at the commands
+for how to process the texture later... Bind it
+This is a command that binds a texture
+and creates a mipmap for that bound texture
+So, the resolution of the original image texture image is reduced by 1/2
+in both the horizontal and vertical directions,
+and the size is also reduced by 1/2 in the horizontal direction
+and the vertical direction height
+So, the process of creating them
+is as follows: until the image size reaches 1 x 1 pixel resolution,
+they are created to have a certain hierarchy
+Okay, let's look at an example
+At Level 0, if we read the original texture image at 64 x 64,
+the size relative to the original would be 1, 1 x 1
+But if we reduce the resolution by half, it becomes 32 x 32, right?
+That will be the image and this will be level 1
+And the size also decreases by half, right?
+Then, we continue to reduce it by 16 x 16, 8 x 8,
+and so on until only 1 x 1, that is, one pixel remains
+So, in this way, the Mipmap levels are created in a hierarchy like this
+First, let's take a look at how to create a texture object,
+read the texture, and generate a mipmap
+First, create a texture object with gl.createTexture
+Next, we need to bind this texture
+We need to bind this texture object to the current target
+gl.TEXTURE_2D and then read the actual image of this texture object
+What is used now is gl.texImage2D,
+which reads the image file and these parameters are entered here
+Let's take a closer look at the code later
+So, if you read the image file like this, gl.generateMipmap(gl.TEXTURE_2D)
+I said that you only call the target like this
+This will generate a minmap
+Then, you can give it the filtering option
+Texture2D, TextureMinFilter are Linear, MinMap, Linear
+We talked about the filtering options before
+Yes, there were NEAREST and LINEAR options
+Yes, so there were things like MIN_FILTER and MAX_FILTER
+Yes, so you can give those things as options
+First of all, binding is the most important thing
+So, according to this, we read everything, create a Mipmap,
+set the filter, and now we can do it like this
+Earlier, we looked at filtering when there was no Mipmap,
+but this time,
+how do we filter when there is
+a Mipmap? In the gl.NEAREST_MIPMAP_NEAREST, NEAREST means
+whether it is NEAREST or LINEAR within one image
+What we're talking about with NEAREST
+is that it ignores the surrounding neighborhoods
+and just picks the closest pixel and paints that pixel's color
+MIPMAP_NEAREST is that it picks the most similar Mipmap level
+among the Mipmaps
+that has the same texel size as the current pixel
+and that Mipmap's image and sets the color there as NEAREST
+MIPMAP_NEAREST after that means that it selects only one level
+among the MipMap levels
+that is closest to the size of the pixel
+and the size of the texel that are most similar to each other
+and paints it with the level that is there. Then gl.LINEAR_MIPMAP_NEAREST
+This LINEAR means that LINEAR filtering is performed within this one
+image, and MIPMAP_NEAREST means that,
+as we did before, we select the Mipmap level
+that has the texel of the closest size among the Mipmaps and apply NEAREST
+Then what about gl.NEAREST_MIPMAP_LINEAR?
+This just applies NEAREST to the same image,
+but what does MIPMAP_LINEAR do?
+Choose two mipmaps with texel sizes that are closest to the pixel size
+We select two mipmaps and perform linear interpolation between them
+Of course, since the two Mipmaps are of different sizes,
+this is actually a method
+where the size of the upper Mipmap is doubled
+and the texel size is doubled to linearly interpolate the color
+Next, gl.LINEAR_MIPMAP_LINEAR will take the most time
+Even within one MIMMAP, choose Linear, and then choose another MIMMAP,
+and then choose Linear for interpolation
+This is the filtering method that has the best quality
+and takes the longest amount of computation time
+So, I explained the filtering method when there is a MIMMAP
+Let's take a look at a Mipmap example
+So let's say we have a triangle in our mesh here,
+and inside of it there's a pixel
+At that time, this is now called the actual pixel size
+Let's assume that this size is actually similar to the 2 x 2
+size of the original image texture
+Before this, if you create a Mipmap for the 8 x 4 base texture,
+The average of these four is 2.5,
+and the average of these 4, 2, 3, 3 is 3, and 0, 8, 1, 6 is 3.75,
+and the average of these is 4 x 2 mipmaps
+Again, these 4... take the average and get 2.43
+Take the average of these four and make it 2.62,
+like 2 x 1, and take the average of these two and make it 2.53
+So if you create a mipmap like this
+and the size of this pixel is the same as the original 2X2,
+where does it read from? In the case of NEAREST, this 4 x 2 mipmap
+Here, reading the average of 4, 2, 3,
+3 is the same as reading 3 here
+So if we read 3, we can filter faster because it's pre-calculated
+Because the mipmap is pre-calculated
+And if this pixel's pixel
+size is about halfway between the texel size of this original
+and the texel size of the next level,
+the level 4 x 2 mipmap above that,
+then we have to average these two
+It will continue like that

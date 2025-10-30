@@ -1,0 +1,126 @@
+﻿
+이 노트에서는 view space 를 clip space 로 변환하는
+projection transformation 과 viewport transformation 에 대해 알아봅니다
+clipping 과정은 어떤 삼각형이 clipping의 볼륨의 경계에 걸쳐 있는 경우
+내부에 있는 부분과 외부에 있는 부분을 분리하여
+내부에 있는 쪽만 그리는 과정을 말합니다
+왼쪽 그림에서는 삼각형들 중 clipping 볼륨의 안쪽에 있는 부분들만 보여지고
+clipping out된 나머지 부분들은 화면에 보이지 않게 됩니다
+오른쪽 그림은 Line Segments 즉 선분들이
+clipping 볼륨에 대해 상대적으로 위치할 수 있는 경우들을 나열한 것입니다
+A는 완전히 clipping 볼륨의 바깥쪽에 있는 경우
+B는 완전히 안쪽에 있는 경우,
+C와 D는 부분적으로 안쪽에 있는 경우들을 말합니다
+3차원의 정의된 물체를 2D 스크린에 그려내야 하기 때문에
+3D에서 2D로의 mapping이 필요하게 됩니다
+이 과정을 projection이라 부릅니다
+그림에서 보면 projector들과 view plane이 교차하는 점들로
+point들이 projection 되고 있음을 알 수 있습니다
+여기에서 projector는 COP 즉 camera의 포지션과
+object 위에 점을 잇는 직선입니다
+projection에는 두 가지 종류가 있는데,
+먼저 parallel projection은 COP가 무한대로 멀리 있는 경우입니다
+모든 projector들이 평행합니다
+이 경우에는 object의 크기 비율이 그대로 유지되어 projection 됩니다
+원근감이 없기 때문에 우리가 사는 실세상과는 다릅니다
+parallel projection은 크기나 거리의 정확성이 요구되는
+기계 설계 등에 쓰입니다
+perspective projection에서는 COP가 유한한 거리에 존재합니다
+좀 더 현실적인 projection 방법입니다
+멀리 있는 물체는 작게, 가까이 있는 물체는 크게 projection 되므로
+실제 크기의 비율이 유지되지는 않습니다
+컴퓨터 그래픽스에서는 대부분 Perspective Projection을 사용합니다
+Parallel Projection은 간단합니다
+3D 좌표의 X 및 Y 좌표를 유지하고, Z 좌표는 무시하면 됩니다
+COP와 view plane 간의 거리를 d 라 합시다
+Point Pc = (Xc, Yc, Zc) 가 camera space에 존재한다고 가정합니다
+parallel projection matrix는 이렇게 간단합니다
+x, y 좌표는 그대로이고 z 좌표는 d가 됩니다
+gl-matrix 가 제공하는 parallel projection matrix 가 있습니다
+mat4.ortho 함수를 사용하는데, parameter 들은 left와 right 범위
+bottom 과 top 의 범위, near 와 far 의 범위를 각각 나타내고 있습니다. 
+이 범위 안에 드는 것들만 clip되어 NDC로 변환되게 됩니다
+이제 perspective projection을 고려하기 위해
+view volume을 정의하도록 하겠습니다
+view volume은 viewing frustum 이라고도 불리는데요
+이것은 truncated pyramid,
+즉 머리가 잘린 pyramid를 옆으로 뉘어 놓은 모양입니다
+near와 far plane 사이에 존재하는 물체들만이
+view plane으로 projection 됩니다
+흔히 view plane과 near plane을 동일하게 놓는 경우가 많습니다
+camera가 바라보는 Viewing Direction이
+view plane, near plane, far plane과 수직을 이루며 
+Viewing Direction Vector는 각 plane의 중심을 관통합니다
+Pc = ( Xc, Yc, Zc) 를 view space의 view 볼륨 상단 평면 위의
+한 점이라 가정합시다
+Pc 를 view plane 상에 projection하여
+point Ps = ( Xs, Ys, Zs) 를 얻는다고 가정합니다
+여기서 Zs 는 COP로부터 view plane까지 거리 d와 같습니다
+Ys는 닮은 꼴 삼각형의 비례식에 의해 구할 수 있습니다
+즉, (Ys/d) 는 (Yc/Zc) 와 같으므로  Ys = d (Yc / Zc) 입니다
+비슷한 과정으로 Xs의 값도 구할 수 있습니다
+앞에서 구한 Xs와 Ys의 좌표를 가지고
+Perspective Transformation의 4 x 4 matrix를 구해보겠습니다
+matrix Tpers는
+View Coordinates를 view plane 위로 projection하는 matrix입니다
+Tpers matrix는 이렇게 생겼습니다
+자세히 보면 맨 아래 row 가 (0, 0, 0, 1) 이 아니라 (0, 0, 1, 0) 인 것을 알 수 있습니다
+이 때문에 transformation 결과의 w 좌표는 1이 아니게 됩니다
+이 homogeneous coordinates의 w 컴포넌트로
+x, y, z 컴포넌트들을 나누면
+최종적으로 이와 같이 projection 된 결과를 얻을 수 있습니다
+projection에 그치지 않고
+Normalization Transformation 이라는 것을 하게 됩니다
+이때 좌표는 Projection Space에서 NDC로 변하게 됩니다
+NDC에서는 projection으로 만들어진 2D의 (Xs, Ys) 좌표를
+X와 Y가 각각 -1부터 1까지인 정사각형으로 transform 합니다
+뿐만 아니라 Zc 의 좌표를 그냥 d로 고정하는 것이 아니라
+원래 Zc 를 d = -1, f = 1,을 기준으로 스케일 해줍니다
+(X, Y) 를 NDC 의 x, y,  normalize,
+View plane 윈도우의 한 변의 길이의 반을 h라고 할 때
+X, Y는 이와 같이 비례식으로 구할 수 있습니다. 
+canonical form의 Z 좌표는 z_c 를
+-1 부터 1까지의 구간으로 찌그러뜨려 넣는 것입니다
+이때 d = -1, f = 1 을 기준으로 합니다
+Z를 canonical form의 z 좌표라 합시다
+Z 는 이와 같은 식으로 구할 수 있습니다
+확인을 위해 z_c 에 d와 f를 넣어보면, Z 는 각각 0 과 1 이 됩니다
+그렇다면 이 식을 어떻게 4 x 4 matrix에 표현할 수 있을까요?
+이제 normalization을 포함하는 모든 과정을
+perspective transformation에 합쳐봅니다
+canonical form의 좌표는 homogeneous coordinates인
+(X, Y, Z, w) 로 나타낼 수 있습니다
+그리고 Perspective Transformation Matrix는 이와 같습니다
+gl-matrix 를 이용하여 perspective matrix 도 쉽게 정의할 수 있습니다
+mat4.perspective 함수를 이용하는 것입니다. 
+두 번째 parameter인 fov 는 field of view 의 약자로서 
+얼마나 넓은 범위를 view에 담을 수 있는지 그 각도를 나타냅니다
+fov는 그림에서와 같이 y 방향의 view 볼륨 각도를 나타냅니다 
+Aspect Ratio는 width / height 비율을 나타냅니다 
+Near와 Far는 camera로부터 near plane과 far plane까지의 거리를 나타냅니다
+Canonical Form이 유명한 것은 여러 가지 이유가 있습니다만
+가장 대표적인 것은 여기에서 보여드리는 것처럼
+Canonical Form을 이용하면 clipping을 쉽게 할 수 있다는 점일 것입니다
+Normalized 되지 않은 경우에 clipping 테스트를 가정해 봅시다
+Point가 View frustum 안에 있는지를 테스트하기 위해
+View frustum 의 경계를 이루는 평면들에 대해
+ Point의 In-Out 테스트를 해야 합니다
+또 In-Out에 걸쳐 있는 Object의 In Part만을 구하기 위해
+평면과 object 간의 intersection 도 구해야 합니다
+이 계산은 꽤 복잡하며 시간도 많이 걸립니다
+반면에 canonical form을 사용하면 어떻습니까?
+Point-in-out 테스트는
+x 또는 y 좌표가 -1 부터 1 사이에 있는지 테스트하는 것이 되므로 매우 간단합니다
+또한 intersection 계산도 훨씬 간단해집니다
+이렇듯 Canonical Form을 사용하면 장점이 있습니다
+Viewport는 스크린에서 그림이 그려지게 되는 부분의 사각형을 말합니다
+스크린 전체가 viewport가 되는 경우도 많이 있습니다
+우리는 Canonical Form의 XY 좌표를
+viewport 윈도우의 픽셀 좌표로 변환해야 합니다
+이전 슬라이드에서 보았듯 Canonical Form의 XY 좌표는
+각각 -1 부터 1 사이의 범위에 있습니다
+이것이 canonical form (X, Y) 에서
+viewport의 좌표 (Vx, Vy) 로 바꾸는 식입니다
+( X, Y) 에 (-1, -1) 을 대입하면 (x1, y1) 이 나옵니다
+(X, Y) 에 (1, 2) 를 대입하면 (x2, y2) 가 나옵니다
+식에 대한 자세한 설명은 생략하도록 하겠습니다

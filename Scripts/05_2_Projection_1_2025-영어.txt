@@ -1,0 +1,126 @@
+﻿
+In this note, we will learn about projection
+transformation and viewport transformation, which transform view space to clip space
+The clipping process is the process of separating the inner
+and outer parts of a triangle that overlaps the boundary of the clipping volume
+and drawing only the inner part
+In the left picture, only the parts of the triangles inside the clipping volume are visible,
+and the remaining parts that are clipped out are not visible on the screen
+The figure on the right lists
+the cases where line segments can be positioned relative to the clipping volume
+A refers to cases where it is completely outside
+the clipping volume, B refers to cases where it is completely inside, and C and D
+refer to cases where it is partially inside
+Because we need to draw a 3D defined object on a 2D screen,
+a 3D to 2D mapping is required
+This process is called projection
+As you can see in the picture,
+points are projected at the intersections of the projectors and the view plane
+Here, the projector is a straight line
+connecting the COP, that is, the position of the camera, and a point on the object
+There are two types of projection
+First, parallel projection is when the COP is infinitely far away
+All projectors are parallel
+In this case, the size ratio of the object is maintained and projected
+Because there is no sense of perspective, it is different from the real world we live in
+Parallel projection is used for machine design
+that requires accuracy in size or distance
+In perspective projection, the COP exists at a finite distance
+A more realistic projection method
+Objects that are far away are projected smaller and objects that are close are projected larger,
+so the actual size ratio is not maintained
+In computer graphics, most people use Perspective Projection
+Parallel Projection is simple
+Just keep the X and Y coordinates of the 3D coordinates and ignore the Z coordinate
+Let the distance between the COP and the view plane be d
+Assume that Point Pc = (Xc, Yc, Zc) exists in camera space
+The parallel projection matrix is simple as this
+x, y coordinates remain the same, z coordinate becomes d
+There is a parallel projection matrix provided by gl-matrix
+The mat4.ortho function is used, and the parameters represent the left and right ranges,
+the bottom and top ranges, and the near and far ranges, respectively
+Only those within these ranges are clipped and converted to NDC
+Now let's define a view
+volume to consider perspective projection
+The view volume, also called the viewing frustum,
+is shaped like a truncated pyramid,
+with its head cut off and laid on its side
+Only objects between the near
+and far planes are projected onto the view plane
+Often, the view plane and near plane are placed the same
+The Viewing Direction that the camera is looking at is perpendicular to the view plane, near plane,
+and far plane, and the Viewing Direction
+Vector passes through the center of each plane
+Let Pc = (Xc, Yc, Zc)
+be a point on the top plane of the view volume in view space
+Let us project Pc onto the view plane to obtain point
+Ps = (Xs, Ys, Zs),
+where Zs is equal to the distance d from the COP to the view plane
+Ys can be found by the proportion of similar triangles
+That is, (Ys/d) is equal to (Yc/Zc), so Ys = d (Yc / Zc)
+We can also obtain the value of Xs using a similar process
+Let's find the 4 x 4 matrix of Perspective Transformation
+using the coordinates of Xs and Ys obtained above
+The matrix Tpers is a matrix that projects the View
+Coordinates onto the view plane
+The Tpers matrix looks like this:
+If you look closely, you can see that the bottom row is not (0, 0, 0, 1), but (0, 0, 1, 0)
+Because of this, the w coordinate of the transformation result is not 1
+If we divide the x,
+y, and z components by the w component of these homogeneous coordinates,
+we can finally obtain a projected result like this
+In addition to projection,
+we perform something called Normalization Transformation
+At this time, the coordinates change from Projection Space to NDC
+In NDC, the 2D (Xs, Ys) coordinates created by projection
+are transformed into a square where X and Y are each from -1 to 1
+In addition, rather than simply fixing the coordinates of Zc to d,
+we scale the original Zc based on d = -1, f = 1
+(X, Y) can be obtained proportionally as follows when x,
+y of NDC are normalized and
+h is half the length of one side of the view plane window
+The Z coordinate of the canonical form
+is z_c squashed into the range from -1 to 1
+At this time, d = -1, f = 1 is used as the standard
+Let Z be the z-coordinate of the canonical form
+Z can be obtained in this way
+To verify, if we put d and f into z_c, Z becomes 0 and 1 respectively
+So how can we express this equation in a 4 x 4 matrix?
+Now let's combine all the processes
+including normalization into the perspective transformation
+The coordinates of the canonical form can be expressed as homogeneous
+coordinates (X, Y, Z, w)
+And the Perspective Transformation Matrix looks like this
+You can also easily define a perspective matrix using gl-matrix
+This is done by using the mat4.perspective function
+The second parameter, fov, stands for field of view
+and indicates the angle at which the view can contain a wide range
+fov represents the view volume angle in the y direction as shown in the figure
+Aspect Ratio represents the width/height ratio
+Near and Far represent the distance from the camera
+to the near plane and far plane
+Canonical Form is famous for many reasons,
+but the most representative one is that it allows for easy clipping as shown here
+Let's assume a clipping test in the case of non-normalized
+In order to test whether a point is inside the view frustum,
+we need to perform an in-out test of the point
+on the planes that form the boundary of the view frustum
+Also, we need to find the intersection between the plane
+and the object to get only the in part of the object that spans the in-out
+This calculation is quite complex and time consuming
+On the other hand, what if we use the canonical form?
+The point-in-out test is very simple,
+as it simply tests whether the x or y coordinate is between -1 and 1
+Also, intersection calculations become much simpler
+There are advantages to using Canonical Form like this
+Viewport refers to the rectangular area on the screen where images are drawn
+In many cases, the entire screen becomes the viewport
+We need to convert the XY
+coordinates of the Canonical Form to pixel coordinates of the viewport window
+As we saw in the previous slide,
+the XY coordinates of a Canonical Form are each in the range -1 to 1
+This is how to convert from canonical form
+(X, Y) to viewport coordinates (Vx, Vy)
+If you substitute (-1, -1) into (X, Y), you get (x1, y1)
+If you substitute (1, 2) into (X, Y), you get (x2, y2)
+I will omit a detailed explanation of the food

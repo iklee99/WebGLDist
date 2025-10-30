@@ -1,0 +1,38 @@
+﻿Arcball 은 소프트웨어로 구현되어
+mouse만으로 rotation을 컨트롤할 수 있는 인터페이스입니다
+이것은 실제 존재하는 trackball 장치를 시뮬레이션 한 것입니다
+trackball 장치는 그림과 같이 생겼는데
+튀어나온 공을 손으로 굴려 회전 데이터를 입력할 수 있게 합니다
+이제 가상의 반구를 컴퓨터 스크린 위에 놓아봅시다
+반구 위의 한 점 (x, y, z) 는 스크린 위의 점 (x, y, 0) 로 mapping할 수 있습니다
+반대로 스크린 위의 한 점 (x, y, 0) 를 mouse로 지정했다고 가정해봅시다
+이 점으로부터 반대로 반구위에 있는 점 (x, y, z) 를 mapping시킬 수 있습니다
+x, y 값은 스크린 상의 좌표와 같습니다
+구의 방정식이 x^2 + y^2 + z^2 = 1 이니까
+z값은 sqrt( 1 - x^2 - y^2) 으로 구할 수 있습니다
+즉 mouse로 스크린 위에 지정하는 어떤 위치를
+arcball 상의 3D 포인트 좌표로 mapping할 수 있는 것입니다
+그렇다면 스크린 위에 프로젝션 되는 부분 이외에
+스크린의 구석 부분, 즉 그림에서 빨간색으로 표시되는 부분의 좌표들은
+어떻게 반구로 mapping 할 수 있을까요?
+이 부분의 mouse 좌표는
+반구 위에서 가장 가까운 포인트로 바꾸어 mapping을 하게 됩니다
+이제 스크린에 mouse 좌표 두 곳으로부터 mapping된
+반구 상의 두 점, p1, p2 를 고려해 봅시다
+우리의 목표는 mouse가 p1 으로부터 p2 로 드래깅 되었을 때
+그 입력 행위가 나타내는 rotation transformation matrix를 구해내는 것입니다
+그러한 transformation을 구하기 위해
+rotation axis 와 rotation angle 을 구해야 합니다
+Rotation Axis는 원점으로부터 반구 상의 p1과 p2 점으로 향하는 두 vector 를
+cross product 하면 쉽게 구할 수 있습니다
+Rotation Angle은 p1과 p2 vector의 dot product 로부터 구할 수 있습니다
+p1과 p2의 dot product 는 그 정의에 의해
+p1의 크기와 p2의 크기의 곱에 cosθ를 곱한 것인데,
+여기서 θ 가 p1, p2 두 vector 사이의 각입니다
+p1과 p2 두 벡터는 반지름이 1 인 unit sphere 위에 있으며
+두 vector 의 크기는 모두 1입니다
+따라서 θ 는 p1과 p2의 dot product 의 arccos 과 같습니다
+이제 rotation axis 와 angle 을 이용하여
+이전에 배웠던 임의의 axis 에 관한 rotation이나
+Quaternion 공식들을 사용하여
+RotationTransformation matrix를 구하면 됩니다

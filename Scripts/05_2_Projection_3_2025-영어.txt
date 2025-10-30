@@ -1,0 +1,38 @@
+﻿Arcball is a software-implemented interface that allows you to control rotation
+using just the mouse
+This is a simulation of a real trackball device
+A trackball device looks like the picture
+and allows you to input rotation data by rolling a protruding ball with your hand
+Now let's place the virtual hemisphere on the computer screen
+A point (x, y, z) on the hemisphere can be mapped to a point (x, y, 0) on the screen
+Conversely, let's assume that we have designated a point (x, y, 0) on the screen with the mouse
+From this point, we can map points (x, y, z) on the opposite hemisphere
+The x, y values are the same as the coordinates on the screen
+Since the equation of a sphere is x^2
++ y^2 + z^2 = 1, the z value can be obtained as sqrt(1 - x^2 - y^2)
+In other words, any location specified on the screen with the mouse can be mapped
+to a 3D point coordinate on the arcball
+So, how can we map the coordinates of the corners of the screen,
+other than the part projected on the screen, i.e
+the part marked in red in the picture, to a hemisphere?
+The mouse coordinates in this section
+are mapped to the nearest point on the hemisphere
+Now, let's consider two points on the hemisphere,
+p1 and p2, mapped from two mouse coordinates on the screen
+Our goal is to find the rotation transformation
+matrix that represents the input behavior when the mouse is dragged from p1 to p2
+To obtain such a transformation,
+we need to obtain the rotation axis and rotation angle
+The rotation axis can be easily obtained by taking the cross product of two vectors
+pointing from the origin to points p1 and p2 on the hemisphere
+Rotation Angle can be obtained from the dot product of vectors p1 and p2
+The dot product of p1 and p2 is, by definition,
+the product of the magnitudes of p1 and p2 times cosθ
+Here, θ is the angle between the two vectors p1 and p2
+The two vectors p1 and p2 lie on the unit sphere with radius 1,
+and the magnitude of both vectors is 1
+Therefore, θ is equal to the arccos of the dot product of p1 and p2
+Now, using the rotation axis and angle,
+we can obtain the RotationTransformation matrix
+using the rotation or Quaternion
+formulas about any axis that we learned before

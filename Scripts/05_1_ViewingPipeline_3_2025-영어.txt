@@ -1,0 +1,137 @@
+﻿Cameras play an important role in computer graphics
+Even if the same objects are fixed in the 3D world,
+the final output image will be different
+depending on how you look at the objects
+This is similar to how the camera
+position and direction when taking a portrait
+can result in different photos of the same person
+The picture shows the game view and working view of the Unity game engine
+The cameras used in these two views are different
+Depending on where you place the camera (marked in white in the Working view)
+and where you look, the scene you see in the actual game
+in the upper game view will change
+The direction of the white camera icon in the working view
+is not the direction the actual camera is looking
+It's just that
+the camera icon is fixed in that direction
+Here the camera is looking towards the two spheres,
+which allows us to see the game view in the upper window
+As mentioned before, the camera in OpenGL
+is always located at the Origin and facing the -Z direction
+We cannot change this position and direction
+So how do we move the camera to the desired position
+and direction to get the view we want?
+It simulates the motion of the camera
+That is, it makes it feel like the camera is moving by moving the object
+visible in the current view
+in the opposite direction of the camera's motion
+This is similar to when you make a train interior set for a movie
+and move the trees outside the window to give the impression that the train is moving
+In other words, the idea is to place objects in the opposite direction
+instead of placing the camera
+To define the camera's space,
+various camera parameters are defined in world space
+The World Coordinate System we are familiar with has X, Y, and Z axes as the basis,
+which are perpendicular to each other, and is a right-handed coordinate system
+That is, the positive direction of the Z-axis is pointing towards us from the screen
+We define several important parameters to define the camera
+P is the position of the camera, called Center of Projection, or COP for short
+A represents the target point that the camera is looking at,
+which we will call At Point here
+V is the UP vector, which is a vector indicating the direction of the top of the camera's head as shown in the picture
+Now, let's define the view, i.e
+Camera (Eye) coordinate system using the parameters above
+We will find the three axes of this coordinate system: U, V, and N
+U is the axis vector in the right direction of the camera,
+which corresponds to the X-axis in the general coordinate system
+V is the axis vector indicating the upward direction of the camera, i.e
+the Y direction, as defined earlier
+Finally, N represents the axis in the direction the camera is looking,
+which corresponds to the +Z axis in the general coordinate system
+N vector is a vector going from P to A
+Also, N is equal to the normal vector of the view plane
+However, as you can see in the picture, the +N direction is opposite to the world space,
+and the +N direction is pointing inward toward the screen from our side
+In other words, the view coordinate system can be said to be a left-handed coordinate system
+Based on this definition of UVN,
+we will look at how to obtain the actual UVN in the next slide
+Now let's look at how to compute the UVN axes
+from the given camera parameters P, A, V
+First, let's assume that instead of the up vector V, a virtual up
+vector V' is given as a parameter
+v' is an approximation vector that represents the approximate UP direction,
+not the exact V direction vector
+In fact, the vector going from P to A is N, and N and V must
+be perpendicular to each other
+However, it is not easy for users to directly calculate these vectors
+and input them as camera parameters
+So, we give a roughly similar v'
+and let the program calculate the exact V
+In many cases, the Y-axis (0, 1, 0) of world space is used as v'
+Of course, if you're holding the camera upside down, the -Y axis might be better
+Calculating N is the easiest
+If the vector (A - P) from P to A is n,
+then normalizing n gives N
+The U vector is perpendicular to both V and N
+We obtain u by taking the cross product of n and v'
+and normalize it to obtain U
+If you look closely, you can find something strange
+Since it is a UVN coordinate system,
+you might think that to find U, you should do V x N rather than N x V
+But that's for the right-handed coordinate system
+As we saw before, since UVN in camera space is a left-handed coordinate system,
+we calculated U by calculating N x V, which is the opposite direction of V x N
+Now that we have N and U, we can find the exact V
+We can do u x n
+to find v, and normalize this to get V
+As above, since we compute the cross product
+in the opposite direction to the
+right-handed coordinate system, we compute u x n, not n x u
+Once the UVN axis of the view space is determined,
+coordinate transformation from world space to view space becomes possible
+Now we can determine the View matrix
+that we mentioned in the previous note,
+05-1 Viewing Pipeline - 1
+First, UVN was obtained using the method described above
+Also the coordinates of COP P are given
+At this time, all coordinates of P and UVN are expressed based on world space
+Also, all UVNs are unit vectors
+According to the Change OF Frame studied previously,
+the Transformation Tcw that converts from View
+Coordinate to World Coordinate is given as follows: Tcw = Tp R,
+which is a general Rotation Before Translation
+type Matrix that arranges UVN vectors
+and P's coordinates into each column of the Matrix
+Since our original goal was the World to View Space,
+which is the opposite direction, the Twc matrix can be obtained by finding the inverse of Tcw like this:
+It is easy to understand if you remember that the inverse of a rotation
+matrix is equal to the transpose of that matrix, and the inverse of a translation
+matrix is equal to reversing the direction of the vector
+Let's look at the process described above with a real example
+To simplify the calculation, COP P is set to world coordinate (0, 0, 5)
+That is, it is on the +Z axis
+and the camera is currently looking at the origin of world space
+That is, let's assume A = (0, 0, 0)
+Let's also assume that the up vector is just the same as the Y-axis
+Please refer to the picture
+First, since N = A - P, N = (0, 0, -1),
+which is the minus Z-axis of the world
+Since U = N x V', U
+= (1, 0, 0), which is the X-axis of the world
+Finally, if we calculate V = U
+x N, as we initially assumed, V becomes the Y-axis of the world
+Now, let's convert a point Qw = (3,
+3, -1) in world space into view coordinates
+As derived in the previous slide,
+the view coordinate Qc is equal to the product of the Twc matrix and Qw
+You will all be able to remember this formula
+If we input the UVN and P coordinate values calculated in the previous section here,
+Qc comes out as (3, 3, 6, 1)
+In fact, this coordinate change is possible intuitively without calculation
+Since the camera is at (0, 0, 5) on the +Z axis of the World and is looking at the origin,
+the Z coordinate of Qw -1 will be 6 in Qc
+It is also easy to understand
+that the remaining U and V remain unchanged at 3
+In this example, the coordinates of COP are slightly changed to (1, -1, 5)
+This will slightly distort the view space and change the NUV axes
+The calculation method is the same as before

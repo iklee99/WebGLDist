@@ -1,0 +1,82 @@
+﻿
+우리는 지금까지 NDC, 즉 Normalized Device Coordinates를
+사용하여 왔습니다
+NDC에서는 XYZ 방향의 각 coordinates의 범위가
+-1 에서 1 사이로 제한됩니다
+이 범위에 들지 않은 object 는 보이지 않게 되는 것이죠
+그러나 이러한 제한은 너무 비현실적입니다
+지금부터 우리는 우리가 사용할 space를 임의로 자유롭게 정하게 될 것입니다
+그리고 Vertex Shader에서는 이러한 임의의 space 를 NDC로 transform 한 후
+그 결과인 gl_Position을 하드웨어로 보내게 됩니다
+그림에서 보면 연두색 직사각형과 노랑색 4분원이
+크기가 90 x 90인 User Defined Space의
+camea boundary 에 그려진 것을 볼 수 있습니다
+Vertex Shader가 이것을 -1과 1 사이의 NDC로 변환한 후
+하드웨어로 보냅니다 
+Vertex Coordinate는 여러 단계를 거치며 변환하게 됩니다
+local space 에서 정의된 좌표는
+Model transformation을 적용하여 world space로 변환되고 
+view transformation 을 적용하여 view space 로 변환됩니다
+또한 projection transformation 을 통해 clip space로 변환된 뒤
+최종적으로 viewport transformation 을 이용하여
+screen space 로 변환되어 screen 에 보여지게 됩니다
+local space는 object space 라고도 불리는데
+특정한 하나의 object 에만 국한된 좌표계입니다
+예를 들어, Blender와 같은 그래픽 소프트웨어에서
+cube 하나를 모델링한다고 가정해 봅시다
+보통 처음에 cube는 원점을 중심으로 하고
+Edge의 하나의 길이가 1인 기본적인 모양을 가집니다
+이후에 우리가 이것의 크기를 바꾸거나
+위치를 옮겨서 재배치하거나 합니다
+이렇게 object 가 처음에 자신을 정의하기 위해 사용되는 좌표계를
+local space라 하고 이때 vertex 의 coordinates를
+local coordinates 라고 합니다
+local space 에서 정의된 object 들은 하나의 공간에 모여서
+한 장면, 즉, scene을 이루게 됩니다
+예를 들면 한 장면 안에 나무, 자동차 등이 모두 출현하는 경우입니다
+집과 나무와 자동차는 모두 처음에
+자신만의 local space들에서 모델링 되었을 것입니다
+이때 예를 들면 각 object의 중심은 원점이고
+크기는 상대적으로 조절되어 있지 않을 것입니다
+이 object 들을 하나의 공간에 모아서 배치해야 하는데
+이 하나의 공간을 World Space라고 합니다
+World Coordinates 는 이 World Space 안에서 정의되는 좌표를 말합니다
+그림에서 보면
+로봇의 팔을 이루는 두 개의 직사각형들은
+처음에 각각의 local space 에서 A와 B로 모델링 되었습니다
+이들을 하나의 World Space로 옮겨서 배치하려면
+local 에서 world space 로의 transformation이 필요하게 됩니다
+local 에서 world 로의 transformation 을 나타내는 matrix 를
+Model matrix 라 부르고
+이 transformation 을 model transformation 이라 부릅니다
+그림에서는 cube 가 local space 로부터 model transformation에 따라
+world space 로 옮겨지는 것을 볼 수 있습니다
+world space의 object는 view transformation 에 의해
+view space로 변환됩니다
+view space 는 camera space 또는 eye space 라고도 불립니다
+view space 는 user의 view 를 중심으로 정의되는 공간입니다
+그림에서 보면 world space 에 object 들이 존재하고 있을 때
+view space 는 camera 의 위치인
+Center Of Projection 즉 COP를 원점으로 가지는 공간입니다
+View Matrix로 나타내지는 View Transformation은
+World에서 View Space로 Coordinate를 변환합니다
+다음은 View Space에서 Clip Space로의 변환입니다
+Clip Space는 Clip Coordinate로 정의되는데,
+이 Clip Coordinate가 바로 NDC입니다
+몇번 이야기했듯이 Vertex Shader에서 최종적인 아웃풋 gl_Position 은
+NDC coordinates를 가져야 합니다
+NDC는 XYZ의 모든 coordinates들이
+-1 과 1 사이의 범위 안에 있습니다
+이 범위 안에 들지 않는 모든 coordinates들은 화면에 보이지 않게 됩니다
+예를 들면 (-2, 0, 0), (0.2, 0.5, -5) 와 같은 점들이죠
+view space 에서 clip space 로의 변화는
+projection matrix 에 의해 행해집니다
+특히 projection transformation 은 두 step 들로 분리될 수 있는데,
+Projection 과 Perspective Division이 그것들 입니다
+마지막 남은 단계는 clip space의 coordinates 를
+viewport transformation 하여
+Screen Space Coordinates로 바꾸는 것입니다
+Screen Space는 실제 디스플레이 화면에 나타내는 픽셀 좌표입니다
+사실 이 viewport transformation은
+그래픽스 하드웨어에 의해 자동으로 일어나게 되어서
+우리가 프로그래밍 할 일은 없습니다

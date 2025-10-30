@@ -1,0 +1,325 @@
+﻿
+CG 장면을 그려내는 데 있어 현실감을 단계적으로 표현해 보도록 합시다
+첫번 그림에는 출연하는 물체들의 Geometry
+즉 모양 만을 사용해서 그리 현실적이지 않습니다
+다음 것은 Phong shading을 사용한 것인데 여전히 뭔가 부족합니다
+마지막 것은 shading 과 texture map 을 같이 사용한 것인데
+훨씬 현실적으로 보입니다
+Texture mapping 은 CG 장면에 현실감을 주는 디테일을 추가해 줍니다
+상세한 2D image로 오브젝트를 감싸듯 렌더링하는 것입니다
+이 디테일을 만약 모두 모델링으로만 구현하려면
+매우 많이 vertex와 face가 필요할 것이어서
+많이 어렵고 복잡할 것입니다
+Texture mapping 은 훨씬 효율적인 방법을 제공합니다
+Texture mapping 은 1974년 미국 University of Utah 를 졸업한
+Edwin Catmull 의 박사 논문에 포함되어 발표되었습니다
+그는 유명한 애니메이션 제작사인 Pixar 의 공동 창업자이며
+월트 디즈니 애니메이션 스튜디오의 CEO를 맡고 있습니다
+그는 2019년에 ACM Turing Award 를 수상했습니다
+그는 textire mapping 이외에도 bicubic surface, spatial anti-aliasing,
+subdivision surface, Z-buffering 등
+현재 CG에 꼭 필요한 중요한 기술들을 많이 발명한 선구자입니다
+texture mapping 기술은 그 후 Catmull의 후배인
+Blinn 과 Newell 등에 의해 더 발전되었습니다
+Texture coordinates 라는 용어를 먼저 설명하겠습니다
+이 좌표는 texture image 위에 위치를 지정하기 위해 사용하는 것입니다
+일반적으로 UV 또는 st로 표시합니다
+또 가로, 세로, 축 모두 0부터 1 사이의 값을 가지도록 되어 있습니다
+texture coordinates 가 하는 역할을 알아보도록 하겠습니다
+여기에 전자회로기판 모양의 texture image 가 있습니다
+이 texture image에는 texture coordinates가 지정되어 있습니다
+texture mapping 의 소스가 될 간단한 모양의 mesh가 있다고 가정해 봅시다
+이 mesh 의 모양은 직사각형이 아니라 약간 찌그러져 있습니다
+이제 4개의 vertex에 texture coordinates 를 주어서
+texture image 가 mesh에 mapping되도록 해보겠습니다
+먼저 첫 번째 방법에서는 4개의 vertex 에
+texture coordinates (0,0), (1,0), (1,1), (0,1) 을 주었습니다
+이렇게 되면 texture image의 전체 영역이 mesh로 mapping됩니다
+mesh가 찌그러져 있기 때문에 image도 같이 찌그러져서
+원래 texture와는 좀 달라 보입니다
+두 번째 방법에서는 texture image의 일부만을 사용하도록
+texture coordinates를 좀 바꿔보았습니다.
+즉, (1,0) 과 (1,1) 대신에 (0.9, 0.4)와 (1, 0.7)을 주었습니다
+texture image 전체가 mapping되지는 않았지만 찌그러짐이 방지되는 것을 확인할 수 있습니다
+texture coordinates는 이와 같이
+오브젝트에 texture image의 어느 부분이 mapping되어야 하는지를
+지정하는 데 사용할 수 있습니다
+이게 지금 페이셜 texture mapping의 예인데요
+왼쪽 것이 texture map image입니다 
+오른쪽이 이 texture mapping이 돼 있는 사람 얼굴 모양의 mesh를 나타내고 있죠
+여기 보면 사람 얼굴 모양의 mesh를 만드는데
+먼저 이렇게 vertex를 끌어당기거나 아니면 밀거나 해서
+3D로 뷰를 돌려가면서 이렇게 에디팅을 주로 많이 하게 되는데
+실제로 그  Blender 같은 소프트웨어에서
+요 하나하나의 vertex들에 해당하는 그 texture의 좌표들이
+이렇게 mapping돼서 그대로 이렇게 평면에 보여지는 것을 볼 수 있습니다
+그러면서 이제 여기에 0부터 1까지의 그 texture coordinates가
+이 해당하는 vertex들의 texture coordinates가 되는 거죠
+그래서 이제 이런 식으로 mapping이 되고 나면
+여기 안에도 이제 작은 그런 픽셀들이 쫙 있을 겁니다
+그 픽셀들의 color를 정하는 것은 이제 해당하는 image에 가서
+어떤 방식으로 평균을 내거나
+여러가지 뒤에 이제 테크닉들이 나올 텐데 그런 테크닉을 사용해서
+image의 color를 보고 정해서 그 color를 그대로 이쪽 픽셀
+즉 fragment에 color를 칠해 주는 거죠
+이런 식으로 해서 texture mapping이 일어나게 되는 겁니다
+그리고 texture wrapping 이라는 거를 좀 고려해 봐야 되는데요
+만약에 어떤 mesh에 우리가 texture coordinates를 그러면 (0,0) 부터 (1,1),
+아까 S,T의 texture coordinates 좌표가
+0부터 1, 0부터 1 사각형 image에, 그거 밖에 다른 texture coordinates,
+즉 0보다 작거나 1보다 큰 그런 texture coordinates를 주었을 때는
+어떻게 되느냐 하는 거죠
+그래서 이 range 밖에 있는 그런 coordinates를 mesh vertex 에 부여했을 때
+어떤 식으로 mapping을 해야 되겠느냐 하는 거죠
+이럴 때 일어나는 default behavior가 gl.REPEAT 입니다
+지금 여기 보시면 이 큰 사각형이 이제 하나의 mesh라고 가정을 해보고요
+우리가 여기에 mapping할 texture image는 이 가운데 빨간색으로 되어 있는
+이 사각형 image가 texture 원본이라고 가정을 해봅시다
+그러면 그런데 texture coordinates가
+이 mesh에 지금 이게 뭉툭하게 돼 있지만
+이제 꼭짓점에 (-1,2), (2,2), (-1,-1), (2,-1) 이렇게 주어졌어요
+즉 textual coordinate의 X range는 -1부터 2. 
+ Y range도 -1 부터 2 이렇게 주어진 거죠
+0부터 1, 0부터 1을 벗어나고 있죠
+이렇게 되면 이게 이제 3등분이 되겠죠
+그래서 여기가 S방향으로 0, 그쵸? 이쪽이 S방향으로 1이 되겠고요
+여기가 T방향으로 0, 여기가 T방향으로 1이 되겠죠
+이 image에 딱 들어맞는 이게 0부터 1, 0부터 1 이렇게 될 테니까요
+그럼 나머지 부분들은 어떤 texture로 매겨야 채워지느냐 하는
+그 behavior가 우리가 texture wrapping behavior라고 하는데
+gl.REPEAT 는 그냥 반복하는 겁니다
+그래서 요렇게 된 texture image를 그대로 쉬프트해서 요렇게 갖다 붙이고
+또 위쪽으로도 아래쪽으로 똑같이 이렇게 갖다 붙이는 이런 그 옵션을
+우리가 gl.REPEAT 옵션이라고 한다라는 거죠
+마찬가지로 gl.MIRRORED_REPEAT 라는 옵션이 있어요
+gl.MIRRORED_REPEAT 라는 것은 일단 이 image가 0부터 1까지 진행 됐으면
+여기서 미러링이 돼요 그러니까 좌우가 바뀌는 거죠
+S 방향으로는 좌우가 바뀌어서 지금 이렇게 mapping이 됐죠?
+이쪽도 마찬가지죠? 이쪽도 좌우가 바뀌면서 미러링이 되고
+위아래도 어때요? 위아래가 바뀌면서 이렇게 mapping이 되죠?
+그래서 좌우, 상하가 반전되면서 mapping되는 이런 옵션을
+gl.MIRRORED_REPEAT 라고 부릅니다
+gl.CLAMP_TO_EDGE라는 옵션은 뭐냐면
+요 edge 끝에 있는 image 끝에 있는 픽셀의 color가 계속 그냥 반복되는 거예요
+그쵸 여기는 지금 짙은 색 픽셀이 요 texture image에 있었기 때문에
+그게 끝까지 반복되는 거죠 이런 식으로
+그래서 이런 띠 형태로 나타내게 되는 흔히 이런 거를
+gl.CLAMP_TO_EDGE 라고 합니다
+그 다음에 gl.CLAMP_TO_BORDER 라는 옵션이 있는데 이거는
+border 의 color를 우리가 임의로 주어줄 수 있어요 하나의 color로
+그래서 그 color가 끝까지 반복되기 때문에
+다 같은 즉 0부터 1,   0부터 1이 벗어나는 그런 영역은
+전부 똑같은 color로 채워지는 거죠
+이런 거를 gl.CLAMP_TO_BORDER 라고 합니다
+그래서 이와 같이 네 개의 그런 texture wrapping  옵션들이 있는 겁니다
+texture 랩핑은 어떻게 그러면 지정을 하느냐 우리가 S하고 T 방향이 있다고 했죠
+그래서 border color를 우리가 주어줘야 한다면
+이건 이제 앞에 바로 이 Clamped Border에
+해당하는 그 border color를 주는 경우인데
+이 border color를 RGBA 값으로 이 경우에 이제 검은색으로 줬네요
+gl.texParameterfv(gl.TEXTURE_2D,
+Texture 2D라는 건 3D texture라는 것도 있어요 우리가 여기서 다루지는 않는데
+그렇기 때문에 2D는 그냥 image 가지고 하는 거고
+그래서 일반적인 우리가 아는 texture mapping을 texture 2D를 사용하는 건데
+그래서 texture 2D에 관한한 texture border color를
+지금부터는 border color, 이 주어진 border color로 만들어라
+라는 그런 명령이 되겠습니다
+그 다음에 같은 texParameter 인데 여기에는 i 가 붙었죠 fv가 아니라
+fv는 floating point vector 라는 뜻이고 i 는 인티저라는 뜻이겠죠
+그래서 똑같이 texture 2D에
+texture 루 Wrap S, 즉 S 방향의 wrapping,
+즉 0부터 1 범위를 벗어나는 그런 경우에 wrapping의 옵션은 gl.REPEAT 다
+사실 gl.REPEAT 는 default이기 때문에 이걸 딱히 안 해줘도 되는데요
+그렇게 할 수 있고, 그 다음에 GL.Texture2D,
+GL.TextureWrapT, 이번에는 T 방향으로는
+gl.CLAMP_TO_BORDER 다 그래서 클램프 투 border
+바로 위에 있는 이 border color를 가지고 끝까지, 그렇죠?
+T방향으로는 border를 하고 S방향으로는 리피트를 하고
+그러니까 S방향과 T방향의 wrapping을 다르게 할 수 있겠다라는 얘기가 되겠습니다 
+texture map image와 스크린 픽셀의 크기와 개수의 차이는
+근본적으로 texture mapping에서 aliasing 문제를 발생시킵니다
+이 그림에서 체크무늬의 texture map image가
+perspective 프로젝션 된 사다리꼴에 mapping되고 있습니다
+texture와 polygon에 대응하는 포인트들이 그림에 표시되어 있습니다
+사다리꼴이 rasterizing 되고 각 픽셀에 해당하는 texture의 color들이 뽑아져
+맨 오른쪽과 같이 mapping됩니다
+그러나 이 결과가 좋은 결과는 결코 아닌 것이 분명합니다
+이를 방지하기 위해 anti-aliasing 기법들이 사용되어야 합니다
+이 그림에서는 왼쪽에 aliasing이 일어나서 texture가 깨지는 경우를 보여주고 있고
+오른쪽은 anti-aliasing을 사용하여 texture mapping의 결과를 개선한 것입니다
+간단하게는 주위의 texel color들을 평균하여
+color를 결정하는 filtering 방법이 있습니다
+texture의 texel을 더 잘게 쪼개는 oversampling 방법도 있습니다
+filtering 방법에 대해 더 알아보기로 합시다
+texture와 polygon을 나타내는 픽셀들의 크기가 딱 들어맞지 않기 때문에
+texture를 확대, 또는 축소해야 하는 경우들이 생깁니다
+예를 들어 polygon의 하나의 픽셀 P가
+texture 안에 여러 개의 texel들로 이루어진 하나의 사각형,
+Quadrilateral이라고 하죠 에 mapping될 때는
+texture image를 축소, 미니피케이션 해야 합니다
+반대로 polygon의 여러 개의 픽셀들이
+texture의 단 한 개의 texel과 mapping되는 경우에는
+texture image를 확대, 즉 magnify 해야 합니다
+texture가 입혀질 polygon의 픽셀이
+texture image의 texel과 딱 들어맞지 않는 경우가 대부분인데,
+이때 polygon 픽셀에 칠해질 color를 texture image로부터 계산해내는 과정을
+texture filtering이라 합니다
+Nearest Filter는 OpenGL의 Default Filtering 방법입니다
+Nearest filtering을 사용하는 경우 그림과 같이
+빨간색 polygon 픽셀이 여러 개의 texture texel에 걸쳐 있는 경우
+그 픽셀의 중심이 속한 texture의 texel color를 그대로 사용하게 됩니다
+주위의 color를 합하여 평균을 낸다던지 하는 추가 프로세싱이 없는 것입니다
+이 방법은 texture mapping 시간을 단축하는 데 도움이 되지만
+전체 polygon에 걸쳐 texture mapping의 질은 그리 좋지 않을 가능성이 있습니다
+왜냐하면 이웃하는 polygon 픽셀들의 color가 급격하게 바뀔 가능성이 있기 때문입니다
+default 방법이기 때문에 따로 filtering 방법을 명시할 필요는 없습니다만
+이와 같이 gl.texParameteri 에 gl.TEXTURE_MIN_FILTER 또는
+gl.TEXTURE_MAG_FILTER 값을 gl.NEAREST 로 지정하면 됩니다
+이번에 소개할 방법은 지정한 texture 코리네이츠, 즉 polygon 픽셀의
+중심을 포함하는 texel 주변의 texel color들을 평균하여 interpolation 하는
+방법으로 Linear Filter 또는 Bilinear Filter라
+불립니다 그림에 보면 빨간색 polygon의 픽셀이 여러 개의 texel들에 걸쳐
+있고 결정되는 color는 이들을 적절히 평균한 interpolation된 color입니다
+간단히 이 방법을 설명한다면 polygon 픽셀 센터에서 고려하는 texel 센터까지의
+거리가 가까우면 가까울수록 그 texel의 color의 비중을 더 높이는 것입니다
+이 방식을 써서 texture filtering을 하려면 GL_TEXTURE_MIN filter
+또는 GL_TEXTURE_MAG filter를 GL_LINEAR 방식으로 지정해야
+합니다.  NEAREST filter와 LINEAR filter를 각각 사용한 경우에
+texture mapping 결과를 비교해 보았습니다 왼쪽의 NEAREST filter의
+경우에는 스크린 픽셀마다 mapping된 texture texel의 color에 변화가 심해지기
+때문에, 이웃하는 픽셀들의 경계를 알아볼 수 있을 정도로 안 좋은 결과가
+나왔습니다 그러나 각각의 픽셀 color들은 매우 선명하게 보입니다 오른쪽의
+Linear Filter의 경우 이웃하는 택셀들의 color들을
+Interpolation하여 픽셀의 color를 결정하기 때문에 이웃하는
+픽셀들의 color는 유연하게 변하는 것을 확인할 수 있습니다 그러나
+전반적으로 texture mapping 이후의 결과는 image에 등장하는 오브젝트들의
+경계선이 뚜렷하지 않은 현상을 보여줍니다 이 점들은 두 가지 방법들 간의
+trade-off 라고 볼 수 있습니다
+Mipmap 은 크기가 다른 texture image들을
+렌더링 전에 미리 준비해 놓는 것을 말합니다
+OpenGL은 사용자가 하나의 texture image를 로드한 후
+MipMap 을 만들어 준비해주는 명령을 가지고 있습니다
+이렇게 하면 스크린 픽셀에서 차지하는 texture image의 크기에 따라
+적절한 texture image를 골라서 사용할 수 있게 됩니다
+즉, 스크린 픽셀의 크기와 texture texel의 크기를
+최대한 비슷하게 유지하자는 것입니다
+MipMap 방식을 사용한 것과 안 한 것은
+최종적인 texture mapping의 품질에 많은 영향을 미칩니다
+그림에서 왼쪽 것은 MipMap 을 적용하지 않은 경우,
+오른쪽은 적용한 경우를 나타냅니다
+이것은 MipMap 을 적용하지 않았을 때와 했을 때의 또 다른 비교 결과입니다
+왼쪽 그림이 MipMap이 없는 경우이고 오른쪽이 MipMap이 있는 경우입니다
+MipMap 이 없는 경우 스크린 픽셀의 이웃 간에 mapping되는
+texture color의 차이가 심해져서
+깜빡거림 현상이 심하게 나타날 수 있습니다
+그래서 MipMap 을 그러면 어떻게 generation 하느냐 하는 걸 좀 보겠습니다
+WebGL은 로딩된 texture image를 가지고
+MipMap을 자동으로 만들어주는 기능을 가지고 있죠
+그래서 거기에 사용되는 함수가 gl.generateMidmap입니다
+여기서 파라미터 타겟으로는 우리가 GL texture 2D를 사용할 수 있죠
+우리는 계속 2D image texture mapping을 하고 있으니까
+그래서 타겟에 현재 바운드된 texture 오브젝트 image의
+Mipmap 체인을 생성합니다
+뒤에 texture를 어떻게... 프로세싱 하는지
+그 명령어들을 쭉 보겠습니다만 바인드를 시킵니다
+texture를 바인드 하는데 그 바인드된 그런 texture를 에 대해서
+Mipmap을 생성하는 그런 명령이 되겠습니다
+그래서 원본 image texture image에 resolution을
+가로 방향, 세로 방향 각 1/2씩 줄여주고
+사이즈도 가로방향 width 세로방향 height를 1/2씩 줄어들게
+그렇게 만들어 줍니다
+그래서 언제까지 만들어 주느냐 하면은
+image의 사이즈가 1 x 1 픽셀 resolution 이 될 때까지를
+계속 만들어서 어떤 hierarchy 를 가지게 합니다
+자 example을 한번 볼까요
+Level 0 에서는 지금 64 x 64에 texture image 원본을 우리가 읽어왔다 라고 하면
+사이즈는 원본에 대한 상대적 크기가 1이겠죠 1 x 1이겠죠
+근데 이거를 반으로 resolution 을 줄이면 32 x 32 그렇죠?
+그런 image가 될 거고 이게 level 1 이 될 겁니다
+그리고 사이즈도 2분의 1씩 줄어들어요 그렇죠?
+그 다음에 16 x 16, 8 x 8 쭉 해서 1 x 1 즉 하나의 픽셀이 남을 때까지 계속해서
+줄여 나가는 거죠. 
+그래서 이런 식으로 그 Mipmap level을 이렇게 hierarchy를 만들어 놓게 됩니다
+일단 texture 오브젝트를 만들고 texture를 읽어와서
+Mipmap generation 하는 것까지를 한번 대략 보면은
+일단 gl.createTexture 라는 걸로 texture 오브젝트를 하나 만듭니다
+그 다음에 이제 이 texture를 바인드 해야 되겠죠
+이 texture 오브젝트를 gl.TEXTURE_2D 지금 현재 타겟에 바인드하고
+다음에 이 texture 오브젝트의 실제 image를 읽어오는 과정이 필요합니다
+그때 사용되는 것이 이제 gl.texImage2D 인데
+이건 image 파일을 읽어오고 이런 파라미터들이 여기 들어가게 됩니다
+우리가 이따가 코드를 볼 때 조금 더 자세히 보도록 하죠
+자 이렇게 해서 image 파일을 읽어오면은
+gl.generateMipmap(gl.TEXTURE_2D) 아까 target만 이렇게 불러준다고 했죠
+이렇게 하면은 minmap이 generate 되는 거고요
+그 다음에 이제 그 filtering 옵션을 주면 되겠죠
+Texture2D, TextureMinFilter는 Linear, MinMap, Linear
+우리가 filtering 옵션 filtering 옵션 앞에서 얘기 다 했었죠 네
+그 NEAREST 또는 LINEAR 이런게 있었잖아요
+네 그래서 MIN_FILTER, MAX_FILTER 이런게 있었죠
+네 그래서 그런 것들을 옵션으로 주면 되겠습니다
+일단 바인드 하는게 제일 중요하죠
+그래서 이거에 따라서 다 읽어오고 Mipmap 도 만들고
+filter도 세팅하고 이제 이런 식으로 하면 되겠습니다 어
+아까는 그 Mipmap 이 없는 상태에서의 그 filtering을 봤었는데 앞에서는
+이번에는 그 Mipmap 이 있는 상태에서의 그러면 filtering을 어떻게 하느냐
+자 gl.NEAREST_MIPMAP_NEAREST
+이 앞에 NEAREST 는 image 하나 내에서
+NEAREST 냐 아니면 LINEAR 냐 하는거 했었죠
+우리가 NEAREST는 그냥 주위에 neighborhood 들을 무시하고
+그냥 가장 가까운 픽셀을 하나 골라서 그 픽셀의 color를
+그냥 칠해 버리는 걸 얘기하는 거고요
+MIPMAP_NEAREST 는 Mipmap 중에
+가장 현재 픽셀과 그 Mipmap의 image의 texel 크기가 같은
+가장 비슷한 그 Mipmap 레벨을 골라서
+거기에 NEAREST 로 이제 색깔을 정하는 거죠
+뒤에 MIPMAP_NEAREST 는 MipMap 중에 하나의 레벨만을
+제일 가까운 걸 골라서 사이즈가 가장 비슷한
+픽셀의 사이즈와 texel의 사이즈가 가장 비슷한 레벨을 골라서
+거기에 있는 걸로 칠해버린다 라는 거죠 
+그 다음에 gl.LINEAR_MIPMAP_NEAREST
+이 LINEAR는 이 하나의 image 안에서 LINEAR filtering을 한다는 얘기고
+MIPMAP_NEAREST는 아까 했던 것처럼
+Mipmap 중에 가장 가까운 사이즈의 texel을 가지고 있는
+그 Mipmap 레벨을 골라서 NEAREST를 적용한다라는 뜻이 되겠습니다
+그 다음에 gl.NEAREST_MIPMAP_LINEAR 는 뭘까요?
+요거는 앞에는 NEAREST를 그냥 그 같은 image 안에서 적용하는 거고
+MIPMAP_LINEAR는 뭐하는 걸까요?
+픽셀 사이즈와 가장 비슷한 사이즈의 texel 사이즈를 갖는 두 개의 Mipmap을 골라요
+두 개의 Mipmap을 골라서 그 둘 사이에 LINEAR interpolation을 하는 거죠
+물론 이제 두 개의 Mipmap이 사이즈도 다르고 하기 때문에
+이때는 실제로는 상위에 있는 Mipmap의 사이즈를 두 배로 해서
+또 texel 사이즈를 두 배로 해서
+color를 LINEAR interpolation 해야 되는 그런 방법이 되겠습니다
+그 다음에 gl.LINEAR_MIPMAP_LINEAR 는 가장 시간이 많이 걸리겠죠
+하나의 MIMMAP 안에서도 Linear를 택하고
+그 다음에 MIMMAP을 택하는데도 Linear를 택해서 interpolation을 하는
+그런 가장 품질은 좋고 계산 시간은 많이 걸리는
+그런 filtering 방법이 되겠습니다
+그래서 MIMMAP 이 있을 경우에 filtering 방법에 대해서 설명을 했습니다
+Mipmap example 한번 볼까요?
+자 우리가 여기에 지금 mesh의 triangle이 하나 존재한다고 하고요
+이 안에 이제 픽셀이 하나 있다고 하죠
+그때 이게 이제 실제 픽셀의 size라고 하고
+이 사이즈가 사실 이 원본 image texture의 
+2 x 2 사이즈하고 비슷하다고 가정을 해봅시다
+이 전에 일단 8 x 4 base texture를 Mipmap을 만들어 버리면
+이 4개를 평균 내서 2.5가 되고 이 4, 2, 3, 3을 평균 내서 3이 되고요
+0, 8, 1, 6을 3.75가 되고요 여기 평균 내서
+그래서 4 x 2 Mipmap이 된 거죠
+또 이거를 이 4개를... 평균 내서 2.43
+이 네 개를 평균 내서 2.62 이렇게 2 x 1로 만들고
+이 두 개를 평균 내서 2.53 이렇게 만드는 거죠
+그래서 Mipmap을 이렇게 만들어 놓고
+이 픽셀의 사이즈가 여기 원본의 2X2랑 같다 그러면
+어디서 읽어오는 거예요? NEAREST일 경우에는 이 4 x 2 Mipmap
+여기서 4, 2, 3, 3을 평균해서 읽어오는 거나 사실
+여기서는 3을 읽어오는 거나 똑같죠
+그래서 3을 읽어오게 되면 미리 계산되어 있기 때문에
+더 빠르게 우리가 filtering을 할 수 있겠다
+Mipmap 이 미리 계산되어 있기 때문에
+그리고 만약에 이 픽셀이 픽셀의 사이즈가
+이쪽 원본의 texel 사이즈와 그 다음에 그 다음 레벨,
+그 위에 레벨 4 x 2 Mipmap의 texel 사이즈의 중간 정도쯤 된다 라고 하면
+이 두 개를 두 개 사이를 평균을 내야 되겠죠
+그런 식으로 계속되게 됩니다

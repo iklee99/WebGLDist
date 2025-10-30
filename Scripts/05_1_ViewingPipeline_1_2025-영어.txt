@@ -1,0 +1,82 @@
+﻿
+We have been using NDC, or Normalized Device
+Coordinates, so far
+In NDC, the range of each coordinate in the XYZ direction
+is limited to -1 to 1
+Objects that are not within this range will become invisible
+However, these limitations are too unrealistic
+From now on, we will be free to decide how much space we will use
+And in Vertex Shader, this arbitrary space is transformed into NDC and the result
+gl_Position is sent to the hardware
+As you can see in the picture, a green rectangle
+and a yellow quadrant are drawn on the camera boundary of a User Defined Space
+with a size of 90 x 90
+The Vertex Shader converts this to NDC between -1 and 1
+and then sends it to the hardware
+Vertex Coordinates are converted in several steps
+Coordinates defined in local space are transformed to world space
+by applying model transformation
+and to view space by applying view transformation
+Additionally, it is converted to clip space through projection transformation,
+and then finally converted to screen space
+using viewport transformation to be displayed on the screen
+Local space, also called object space,
+is a coordinate system limited to a specific object
+For example, let's say
+you're modeling a cube in graphics software like Blender
+Usually, initially, the cube has a basic shape centered at the origin
+and one edge has a length of 1
+Afterwards, we resize this, move it,
+or rearrange it
+The coordinate system that an object initially uses to define itself
+is called local space, and the coordinates of the vertices at this time
+are called local coordinates
+Objects defined in local space
+are gathered in one space to form a scene
+For example, if trees, cars, etc. all appear in one scene
+Houses, trees, and cars would
+all have been initially modeled in their own local spaces
+For example, the center of each object is the origin
+and the size will not be relatively adjusted
+These objects must be placed together in one space,
+and this one space is called World Space
+World Coordinates refer to the coordinates defined within this World Space
+As you can see in the figure,
+the two rectangles that make up the robot's arm
+are initially modeled as A and B in their respective local spaces
+To move and place them in one World Space,
+a transformation from local to world space is required
+The matrix representing the transformation from local to world
+is called the model matrix,
+and this transformation is called the model transformation
+In the figure, you can see that the cube is translated from local space
+to world space according to the model transformation
+The object in world space is transformed to view space
+by the view transformation
+View space is also called camera space or eye space
+View space is the space defined around the user's view
+As you can see in the picture, when objects exist in world space,
+the view space is a space that has the Center Of Projection, or COP,
+which is the location of the camera, as its origin
+View Transformation, represented by the View
+Matrix, transforms coordinates from World Space to View Space
+The following is a transformation from View
+Space to Clip Space
+Clip Space is defined by Clip Coordinate, which is NDC
+As I've mentioned several times,
+the final output gl_Position in the Vertex Shader must have NDC coordinates
+NDC means that all coordinates
+of XYZ are in the range -1 to 1
+Any coordinates that are not within this range will not be visible on the screen
+For example, points like (-2, 0, 0), (0.2, 0.5, -5)
+The transformation from view space to clip space
+is done by the projection matrix
+In particular, the projection transformation can be separated into two steps:
+Projection and Perspective Division
+The last remaining step is to transform the coordinates in clip
+space to viewport coordinates
+and convert them to screen space coordinates
+Screen space is the pixel coordinates that appear on the actual display screen
+In fact, this viewport
+transformation happens automatically by the graphics hardware,
+so we don't have to program it
